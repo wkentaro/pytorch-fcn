@@ -29,8 +29,8 @@ class PascalVOC2012ClassSeg(data.Dataset):
             for did in open(imgsets_file):
                 did = did.strip()
                 img_file = osp.join(dataset_dir, 'JPEGImages/%s.jpg' % did)
-                lbl_file = osp.join(dataset_dir,
-                    'SegmentationClass/%s.png' % did)
+                lbl_file = osp.join(
+                    dataset_dir, 'SegmentationClass/%s.png' % did)
                 self.files[data_type].append({
                     'img': img_file,
                     'lbl': lbl_file,

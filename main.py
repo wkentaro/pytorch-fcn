@@ -1,13 +1,13 @@
 import fcn
 import numpy as np
 import torch
+from torch.autograd import Variable
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.autograd import Variable
 import torchvision
 
-from torchfcn import models
 from torchfcn import datasets
+from torchfcn import models
 
 
 cuda = True
@@ -41,7 +41,7 @@ for l1, l2 in zip(vgg16.features, model.features):
             l2.weight = l1.weight
         if l1.bias.size() == l2.bias.size():
             l2.bias = l1.bias
-    except:
+    except AttributeError:
         pass
 if cuda:
     model = model.cuda()
@@ -75,7 +75,8 @@ def validate(epoch):
     metrics = np.mean(metrics, axis=0)
 
     val_loss /= len(val_loader)
-    print('Val Epoch: {0:08}, loss={1:.2f}, acc={2:.4f}, acc_cls={3:.4f}, mean_iu={4:.4f}'
+    print('Val Epoch: {0:08}, loss={1:.2f}, acc={2:.4f}, '
+          'acc_cls={3:.4f}, mean_iu={4:.4f}'
           .format(epoch, val_loss, metrics[0], metrics[1], metrics[3]))
 
 
@@ -107,8 +108,10 @@ def train(epoch):
 
         iteration = batch_idx + epoch * len(train_loader)
         if batch_idx % log_interval == 0:
-            print('Train epoch={0:08}, iter={1:012}, loss={2:.2f}, acc={3:.4f}, acc_cls={4:.4f}, mean_iu={5:.4f}'
-                  .format(epoch, iteration, loss.data[0], metrics[0], metrics[1], metrics[2], metrics[3]))
+            print('Train epoch={0:08}, iter={1:012}, loss={2:.2f}, '
+                  'acc={3:.4f}, acc_cls={4:.4f}, mean_iu={5:.4f}'
+                  .format(epoch, iteration, loss.data[0],
+                          metrics[0], metrics[1], metrics[2]))
         if iteration >= max_iter:
             break
     return iteration
@@ -117,7 +120,7 @@ def train(epoch):
 epoch = 0
 while True:
     iteration = train(epoch)
-    test(epoch)
+    validate(epoch)
     if iteration >= max_iter:
         break
     epoch += 1

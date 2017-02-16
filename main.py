@@ -65,8 +65,11 @@ def validate(epoch):
         output = output.transpose(1, 2).transpose(2, 3).contiguous()
         output = output.view(-1, c)
         target = target.view(-1)
-        val_loss += F.cross_entropy(output, target, size_average=False)[0]
-
+        val_loss += F.cross_entropy(
+            output.transpose(1, 2).transpose(2, 3).contiguous().view(-1, c),
+            target.view(-1),
+            size_average=False)[0]
+        lbl_pred = output.data.max(1)[1].cpu().numpy()[:, 0, :, :]
         lbl_true = target.data.cpu()
         for lt, lp in zip(lbl_true, lbl_pred):
             acc, acc_cls, mean_iu, fwavacc = fcn.utils.label_accuracy_score(

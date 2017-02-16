@@ -4,6 +4,7 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.autograd import Variable
+import torchvision
 
 from torchfcn import models
 from torchfcn import datasets
@@ -31,6 +32,17 @@ val_loader = torch.utils.data.DataLoader(
 
 
 model = models.FCN32s(n_class=21)
+pth_file = '/home/wkentaro/.torch/models/vgg16-00b39a1b.pth'
+vgg16 = torchvision.models.vgg16()
+vgg16.load_state_dict(torch.load(pth_file))
+for l1, l2 in zip(vgg16.features, model.features):
+    try:
+        if l1.weight.size() == l2.weight.size():
+            l2.weight = l1.weight
+        if l1.bias.size() == l2.bias.size():
+            l2.bias = l1.bias
+    except:
+        pass
 if cuda:
     model = model.cuda()
 

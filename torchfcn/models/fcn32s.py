@@ -5,7 +5,7 @@ class FCN32s(nn.Module):
 
     def __init__(self, n_class=21):
         super(FCN32s, self).__init__()
-        self.segmenter = nn.Sequential(
+        self.features = nn.Sequential(
             # conv1
             nn.Conv2d(3, 64, 3, padding=100),
             nn.ReLU(inplace=True),
@@ -46,7 +46,8 @@ class FCN32s(nn.Module):
             nn.Conv2d(512, 512, 3, padding=1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/32
-
+        )
+        self.segmenter = nn.Sequential(
             # fc6
             nn.Conv2d(512, 4096, 7),
             nn.ReLU(inplace=True),
@@ -65,7 +66,9 @@ class FCN32s(nn.Module):
         )
 
     def forward(self, x):
-        y = self.segmenter(x)
-        y = y[:, :, 19:19+x.size()[2], 19:19+x.size()[3]]
-        y = y.contiguous()
-        return y
+        y = self.features(x)
+
+        z = self.segmenter(y)
+        z = z[:, :, 19:19+x.size()[2], 19:19+x.size()[3]].contiguous()
+
+        return z

@@ -1,7 +1,10 @@
+import os
+import os.path as osp
 import shutil
 
 import fcn
 import numpy as np
+import scipy.misc
 import torch
 from torch.autograd import Variable
 import torch.nn.functional as F
@@ -14,9 +17,25 @@ from torchfcn import models
 
 cuda = True
 seed = 1
-log_interval = 10
 max_iter = 100000
 best_mean_iu = 0
+log_headers = [
+    'epoch',
+    'iteration',
+    'train/loss',
+    'train/acc',
+    'train/acc_cls',
+    'train/mean_iu',
+    'train/fwavacc',
+    'valid/loss',
+    'valid/acc',
+    'valid/acc_cls',
+    'valid/mean_iu',
+    'valid/fwavacc',
+]
+
+with open('log.csv', 'w') as f:
+    f.write(','.join(log_headers) + '\n')
 
 torch.manual_seed(seed)
 if cuda:
@@ -60,9 +79,14 @@ optimizer = optim.SGD(model.parameters(), lr=1e-10, momentum=0.99,
 
 def validate(epoch):
     model.eval()
+
+    out = 'viz_%08d' % epoch
+    if not osp.exists(out):
+        os.makedirs(out)
+
     val_loss = 0
     metrics = []
-    for data, target in val_loader:
+    for batch_idx, (data, target) in enumerate(val_loader):
         if cuda:
             data, target = data.cuda(), target.cuda()
         data, target = Variable(data, volatile=True), Variable(target)
@@ -76,18 +100,28 @@ def validate(epoch):
         labels = labels[labels >= 0]
         val_loss += F.cross_entropy(logit, labels, size_average=False).data[0]
 
+        vizs = []
+        data = data.data.cpu()
         lbl_pred = output.data.max(1)[1].cpu().numpy()[:, 0, :, :]
-        lbl_true = target.data.cpu().numpy()
-        for lt, lp in zip(lbl_true, lbl_pred):
+        lbl_true = target.data.cpu()
+        for img, lt, lp in zip(data, lbl_true, lbl_pred):
+            img, lt = val_loader.dataset.untransform(img, lt)
             acc, acc_cls, mean_iu, fwavacc = fcn.utils.label_accuracy_score(
                 lt, lp, n_class=21)
             metrics.append((acc, acc_cls, mean_iu, fwavacc))
+            viz = fcn.utils.visualize_segmentation(lp, lt, img, n_class=21)
+            vizs.append(viz)
+        viz = fcn.utils.get_tile_image(vizs)
+        scipy.misc.imsave(osp.join(out, '%012d.jpg' % batch_idx), viz)
     metrics = np.mean(metrics, axis=0)
 
     val_loss /= len(val_loader)
-    print('Valid epoch={0:08}, loss={1:.2f}, acc={2:.4f}, '
-          'acc_cls={3:.4f}, mean_iu={4:.4f}'
-          .format(epoch, val_loss, metrics[0], metrics[1], metrics[2]))
+
+    with open('log.csv', 'a') as f:
+        iteration = epoch * len(train_loader)
+        log = [epoch, iteration] + [''] * 5 + [val_loss] + metrics.tolist()
+        log = map(str, log)
+        f.write(','.join(log) + '\n')
 
     global best_mean_iu
     mean_iu = metrics[2]
@@ -132,12 +166,13 @@ def train(epoch):
             metrics.append((acc, acc_cls, mean_iu, fwavacc))
         metrics = np.mean(metrics, axis=0)
 
+        with open('log.csv', 'a') as f:
+            iteration = epoch * len(train_loader)
+            log = [epoch, iteration] + [loss.data[0]] + metrics.tolist() + [''] * 5
+            log = map(str, log)
+            f.write(','.join(log) + '\n')
+
         iteration = batch_idx + epoch * len(train_loader)
-        if batch_idx % log_interval == 0:
-            print('Train epoch={0:08}, iter={1:012}, loss={2:.2f}, '
-                  'acc={3:.4f}, acc_cls={4:.4f}, mean_iu={5:.4f}'
-                  .format(epoch, iteration, loss.data[0],
-                          metrics[0], metrics[1], metrics[2]))
         if iteration >= max_iter:
             break
     return iteration

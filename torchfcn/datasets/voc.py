@@ -65,3 +65,12 @@ class PascalVOC2012ClassSeg(data.Dataset):
         img = torch.from_numpy(img).float()
         lbl = torch.from_numpy(lbl).long()
         return img, lbl
+
+    def untransform(self, img, lbl):
+        img = img.numpy()
+        img = img.transpose(1, 2, 0)
+        img += self.mean_bgr
+        img = img.astype(np.uint8)
+        img = img[:, :, ::-1]
+        lbl = lbl.numpy()
+        return img, lbl

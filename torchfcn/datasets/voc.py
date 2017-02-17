@@ -51,8 +51,7 @@ class PascalVOC2012ClassSeg(data.Dataset):
         lbl_file = data_file['lbl']
         lbl = PIL.Image.open(lbl_file)
         lbl = np.array(lbl, dtype=np.int32)
-        # TODO(wkentaro): support masking in softmax_cross_entropy
-        lbl[lbl == 255] = 0
+        lbl[lbl == 255] = -1
         if self._transform:
             return self.transform(img, lbl)
         else:

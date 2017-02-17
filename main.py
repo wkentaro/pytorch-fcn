@@ -1,3 +1,5 @@
+import shutil
+
 import fcn
 import numpy as np
 import torch
@@ -14,10 +16,13 @@ cuda = True
 seed = 1
 log_interval = 10
 max_iter = 100000
+best_mean_iu = 0
 
 torch.manual_seed(seed)
 if cuda:
     torch.cuda.manual_seed(seed)
+
+# 1. dataset
 
 root = '/home/wkentaro/.chainer/dataset'
 kwargs = {'num_workers': 4, 'pin_memory': True} if cuda else {}
@@ -30,6 +35,7 @@ val_loader = torch.utils.data.DataLoader(
         root, train=False, transform=True),
     batch_size=1, shuffle=False, **kwargs)
 
+# 2. model
 
 model = models.FCN32s(n_class=21)
 pth_file = '/home/wkentaro/.torch/models/vgg16-00b39a1b.pth'
@@ -46,6 +52,8 @@ for l1, l2 in zip(vgg16.features, model.features):
 if cuda:
     model = model.cuda()
 
+# 3. optimizer
+
 optimizer = optim.SGD(model.parameters(), lr=1e-10, momentum=0.99,
                       weight_decay=0.0005)
 
@@ -59,18 +67,17 @@ def validate(epoch):
             data, target = data.cuda(), target.cuda()
         data, target = Variable(data, volatile=True), Variable(target)
         output = model(data)
-        lbl_pred = output.data.max(1)[1]
 
         n, c, h, w = output.size()
-        output = output.transpose(1, 2).transpose(2, 3).contiguous()
-        output = output.view(-1, c)
-        target = target.view(-1)
-        val_loss += F.cross_entropy(
-            output.transpose(1, 2).transpose(2, 3).contiguous().view(-1, c),
-            target.view(-1),
-            size_average=False)[0]
+        logit = output.transpose(1, 2).transpose(2, 3).contiguous()
+        labels = target
+        logit = logit[labels.view(n, h, w, 1).repeat(1, 1, 1, c) >= 0]
+        logit = logit.view(-1, c)
+        labels = labels[labels >= 0]
+        val_loss += F.cross_entropy(logit, labels, size_average=False).data[0]
+
         lbl_pred = output.data.max(1)[1].cpu().numpy()[:, 0, :, :]
-        lbl_true = target.data.cpu()
+        lbl_true = target.data.cpu().numpy()
         for lt, lp in zip(lbl_true, lbl_pred):
             acc, acc_cls, mean_iu, fwavacc = fcn.utils.label_accuracy_score(
                 lt, lp, n_class=21)
@@ -78,9 +85,23 @@ def validate(epoch):
     metrics = np.mean(metrics, axis=0)
 
     val_loss /= len(val_loader)
-    print('Val Epoch: {0:08}, loss={1:.2f}, acc={2:.4f}, '
+    print('Valid epoch={0:08}, loss={1:.2f}, acc={2:.4f}, '
           'acc_cls={3:.4f}, mean_iu={4:.4f}'
-          .format(epoch, val_loss, metrics[0], metrics[1], metrics[3]))
+          .format(epoch, val_loss, metrics[0], metrics[1], metrics[2]))
+
+    global best_mean_iu
+    mean_iu = metrics[2]
+    is_best = mean_iu > best_mean_iu
+    if is_best:
+        best_mean_iu = mean_iu
+    torch.save({
+        'epoch': epoch,
+        'arch': 'FCN32s',
+        'state_dict': model.state_dict(),
+        'best_mean_iu': best_mean_iu,
+    }, 'checkpoint.pth.tar')
+    if is_best:
+        shutil.copy('checkpoint.pth.tar', 'model_best.pth.tar')
 
 
 def train(epoch):
@@ -93,10 +114,12 @@ def train(epoch):
         output = model(data)
 
         n, c, h, w = output.size()
-        loss = F.cross_entropy(
-            output.transpose(1, 2).transpose(2, 3).contiguous().view(-1, c),
-            target.view(-1),
-            size_average=False)
+        logit = output.transpose(1, 2).transpose(2, 3).contiguous()
+        labels = target
+        logit = logit[labels.view(n, h, w, 1).repeat(1, 1, 1, c) >= 0]
+        logit = logit.view(-1, c)
+        labels = labels[labels >= 0]
+        loss = F.cross_entropy(logit, labels, size_average=False)
         loss.backward()
         optimizer.step()
 
@@ -122,8 +145,8 @@ def train(epoch):
 
 epoch = 0
 while True:
-    iteration = train(epoch)
     validate(epoch)
+    iteration = train(epoch)
     if iteration >= max_iter:
         break
     epoch += 1

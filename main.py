@@ -80,12 +80,9 @@ optimizer = optim.SGD(model.parameters(), lr=1e-10, momentum=0.99,
 def validate(epoch):
     model.eval()
 
-    out = 'viz_%08d' % epoch
-    if not osp.exists(out):
-        os.makedirs(out)
-
     val_loss = 0
     metrics = []
+    vizs = []
     for batch_idx, (data, target) in enumerate(val_loader):
         if cuda:
             data, target = data.cuda(), target.cuda()
@@ -100,7 +97,6 @@ def validate(epoch):
         labels = labels[labels >= 0]
         val_loss += F.cross_entropy(logit, labels, size_average=False).data[0]
 
-        vizs = []
         data = data.data.cpu()
         lbl_pred = output.data.max(1)[1].cpu().numpy()[:, 0, :, :]
         lbl_true = target.data.cpu()
@@ -109,11 +105,11 @@ def validate(epoch):
             acc, acc_cls, mean_iu, fwavacc = fcn.utils.label_accuracy_score(
                 lt, lp, n_class=21)
             metrics.append((acc, acc_cls, mean_iu, fwavacc))
-            viz = fcn.utils.visualize_segmentation(lp, lt, img, n_class=21)
-            vizs.append(viz)
-        viz = fcn.utils.get_tile_image(vizs)
-        scipy.misc.imsave(osp.join(out, '%012d.jpg' % batch_idx), viz)
+            if len(vizs) < 9:
+                viz = fcn.utils.visualize_segmentation(lp, lt, img, n_class=21)
+                vizs.append(viz)
     metrics = np.mean(metrics, axis=0)
+    scipy.misc.imsave('%08d.jpg' % epoch, fcn.utils.get_tile_image(vizs))
 
     val_loss /= len(val_loader)
 
@@ -166,13 +162,13 @@ def train(epoch):
             metrics.append((acc, acc_cls, mean_iu, fwavacc))
         metrics = np.mean(metrics, axis=0)
 
+        iteration = batch_idx + epoch * len(train_loader)
+
         with open('log.csv', 'a') as f:
-            iteration = epoch * len(train_loader)
             log = [epoch, iteration] + [loss.data[0]] + metrics.tolist() + [''] * 5
             log = map(str, log)
             f.write(','.join(log) + '\n')
 
-        iteration = batch_idx + epoch * len(train_loader)
         if iteration >= max_iter:
             break
     return iteration

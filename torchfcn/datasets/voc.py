@@ -9,10 +9,9 @@ import torch
 from torch.utils import data
 
 
-class PascalVOC2012ClassSeg(data.Dataset):
+class VOC2012ClassSeg(data.Dataset):
 
     url = 'http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar'  # NOQA
-    base_folder = 'pascal'
     mean_bgr = np.array([104.00698793, 116.66876762, 122.67891434])
 
     def __init__(self, root, train=True, transform=False):
@@ -21,7 +20,7 @@ class PascalVOC2012ClassSeg(data.Dataset):
         self._transform = transform
 
         dataset_dir = osp.join(
-            self.root, self.base_folder, 'VOCdevkit/VOC2012')
+            self.root, 'VOCdevkit/VOC2012')
         self.files = collections.defaultdict(list)
         for data_type in ['train', 'val']:
             imgsets_file = osp.join(

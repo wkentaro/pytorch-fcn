@@ -46,12 +46,10 @@ if cuda:
 root = '/home/wkentaro/.chainer/dataset'
 kwargs = {'num_workers': 4, 'pin_memory': True} if cuda else {}
 train_loader = torch.utils.data.DataLoader(
-    datasets.PascalVOC2012ClassSeg(
-        root, train=True, transform=True),
+    datasets.VOC2012ClassSeg(root, train=True, transform=True),
     batch_size=1, shuffle=True, **kwargs)
 val_loader = torch.utils.data.DataLoader(
-    datasets.PascalVOC2012ClassSeg(
-        root, train=False, transform=True),
+    datasets.VOC2012ClassSeg(root, train=False, transform=True),
     batch_size=1, shuffle=False, **kwargs)
 
 # 2. model

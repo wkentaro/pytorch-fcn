@@ -1,1 +1,1 @@
-from .voc import PascalVOC2012ClassSeg  # NOQA
+from .voc import VOC2012ClassSeg  # NOQA

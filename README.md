@@ -8,6 +8,9 @@ Fully Convolutional Networks implemented with PyTorch.
 
 **FCN32s on VOC2012**
 
+- `batch_size=1`
+- `MomentumSGD(lr=1e-10, momentum=0.99, weight_decay=0.0005)`
+
 |   epoch |   iteration |   valid/loss |   valid/acc |   valid/acc_cls |   valid/mean_iu |   valid/fwavacc |
 |--------:|------------:|-------------:|------------:|----------------:|----------------:|----------------:|
 |      58 |       84912 |       121321 |    0.868776 |        0.746134 |        0.412695 |        0.821124 |

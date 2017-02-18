@@ -17,7 +17,8 @@ Fully Convolutional Networks implemented with PyTorch.
 
 ## Speed
 
-It is ~4 times faster than [FCN implemented with Chainer](https://github.com/wkentaro/fcn).
+It is ~4 times faster than [FCN implemented with Chainer](https://github.com/wkentaro/fcn),
+measuring with Titan X Pascal.
 
 ```bash
 % ./speedtest.py --gpu 0 --times 1000

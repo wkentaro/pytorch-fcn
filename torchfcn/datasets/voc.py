@@ -9,18 +9,17 @@ import torch
 from torch.utils import data
 
 
-class VOC2012ClassSeg(data.Dataset):
+class VOCClassSegBase(data.Dataset):
 
-    url = 'http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar'  # NOQA
     mean_bgr = np.array([104.00698793, 116.66876762, 122.67891434])
 
-    def __init__(self, root, train=True, transform=False):
+    def __init__(self, root, year, train=True, transform=False):
         self.root = root
         self.train = train
         self._transform = transform
 
         dataset_dir = osp.join(
-            self.root, 'VOCdevkit/VOC2012')
+            self.root, 'VOCdevkit/VOC%d' % year)
         self.files = collections.defaultdict(list)
         for data_type in ['train', 'val']:
             imgsets_file = osp.join(
@@ -73,3 +72,21 @@ class VOC2012ClassSeg(data.Dataset):
         img = img[:, :, ::-1]
         lbl = lbl.numpy()
         return img, lbl
+
+
+class VOC2011ClassSeg(VOCClassSegBase):
+
+    url = 'http://host.robots.ox.ac.uk/pascal/VOC/voc2011/VOCtrainval_25-May-2011.tar'  # NOQA
+
+    def __init__(self, root, train=True, transform=False):
+        super(VOC2011ClassSeg, self).__init__(
+            root, year=2011, train=train, transform=transform)
+
+
+class VOC2012ClassSeg(VOCClassSegBase):
+
+    url = 'http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar'  # NOQA
+
+    def __init__(self, root, train=True, transform=False):
+        super(VOC2012ClassSeg, self).__init__(
+            root, year=2012, train=train, transform=transform)

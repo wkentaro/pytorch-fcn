@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+import argparse
 import os
 import os.path as osp
 import shutil
@@ -15,7 +18,16 @@ from torchfcn import datasets
 from torchfcn import models
 
 
-cuda = True
+parser = argparse.ArgumentParser()
+parser.add_argument('--gpu', type=int, default=0)
+parser.add_argument('--year', type=int, default=2012, choices=(2011, 2012),
+                    help='Year of VOC dataset (default: 2012)')
+args = parser.parse_args()
+
+gpu = args.gpu
+year = args.year
+
+cuda = gpu >= 0
 seed = 1
 max_iter = 100000
 best_mean_iu = 0
@@ -41,15 +53,24 @@ torch.manual_seed(seed)
 if cuda:
     torch.cuda.manual_seed(seed)
 
+torch.cuda.set_device(gpu)
+
 # 1. dataset
 
-root = '/home/wkentaro/.chainer/dataset'
+if year == 2011:
+    dataset_class = datasets.VOC2011ClassSeg
+elif year == 2012:
+    dataset_class = datasets.VOC2012ClassSeg
+else:
+    raise ValueError
+
+root = '/home/wkentaro/.torch/datasets'
 kwargs = {'num_workers': 4, 'pin_memory': True} if cuda else {}
 train_loader = torch.utils.data.DataLoader(
-    datasets.VOC2012ClassSeg(root, train=True, transform=True),
+    dataset_class(root, train=True, transform=True),
     batch_size=1, shuffle=True, **kwargs)
 val_loader = torch.utils.data.DataLoader(
-    datasets.VOC2012ClassSeg(root, train=False, transform=True),
+    dataset_class(root, train=False, transform=True),
     batch_size=1, shuffle=False, **kwargs)
 
 # 2. model

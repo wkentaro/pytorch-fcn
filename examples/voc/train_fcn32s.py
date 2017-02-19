@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import os.path as osp
 
 # FIXME: torch -> scipy.misc raises SEGV
 import scipy.misc  # NOQA

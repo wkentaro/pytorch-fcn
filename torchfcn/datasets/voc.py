@@ -11,6 +11,29 @@ from torch.utils import data
 
 class VOCClassSegBase(data.Dataset):
 
+    class_names = np.array([
+        'background',
+        'aeroplane',
+        'bicycle',
+        'bird',
+        'boat',
+        'bottle',
+        'bus',
+        'car',
+        'cat',
+        'chair',
+        'cow',
+        'diningtable',
+        'dog',
+        'horse',
+        'motorbike',
+        'person',
+        'potted plant',
+        'sheep',
+        'sofa',
+        'train',
+        'tv/monitor',
+    ])
     mean_bgr = np.array([104.00698793, 116.66876762, 122.67891434])
 
     def __init__(self, root, year, train=True, transform=False):

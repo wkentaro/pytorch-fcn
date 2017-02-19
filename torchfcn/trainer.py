@@ -54,6 +54,8 @@ class Trainer(object):
         self.model.eval()
         self.iteration = self.epoch * len(self.train_loader)
 
+        n_class = len(self.val_loader.dataset.class_names)
+
         val_loss = 0
         metrics = []
         visualizations = []
@@ -78,11 +80,11 @@ class Trainer(object):
             for img, lt, lp in zip(imgs, lbl_true, lbl_pred):
                 img, lt = self.val_loader.dataset.untransform(img, lt)
                 acc, acc_cls, mean_iu, fwavacc = \
-                    fcn.utils.label_accuracy_score(lt, lp, n_class=21)
+                    fcn.utils.label_accuracy_score(lt, lp, n_class=n_class)
                 metrics.append((acc, acc_cls, mean_iu, fwavacc))
                 if len(visualizations) < 9:
                     viz = fcn.utils.visualize_segmentation(
-                        lp, lt, img, n_class=21)
+                        lp, lt, img, n_class=n_class)
                     visualizations.append(viz)
         metrics = np.mean(metrics, axis=0)
 
@@ -117,6 +119,8 @@ class Trainer(object):
     def train_epoch(self):
         self.model.train()
 
+        n_class = len(self.train_loader.dataset.class_names)
+
         for batch_idx, (data, target) in enumerate(self.train_loader):
             self.iteration = batch_idx + self.epoch * len(self.train_loader)
 
@@ -141,7 +145,7 @@ class Trainer(object):
             lbl_true = target.data.cpu().numpy()
             for lt, lp in zip(lbl_true, lbl_pred):
                 acc, acc_cls, mean_iu, fwavacc = \
-                    fcn.utils.label_accuracy_score(lt, lp, n_class=21)
+                    fcn.utils.label_accuracy_score(lt, lp, n_class=n_class)
                 metrics.append((acc, acc_cls, mean_iu, fwavacc))
             metrics = np.mean(metrics, axis=0)
 

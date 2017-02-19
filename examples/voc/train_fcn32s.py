@@ -42,7 +42,7 @@ def main():
     else:
         raise ValueError
 
-    root = '/home/wkentaro/.torch/datasets'
+    root = osp.expanduser('~/data/datasets')
     kwargs = {'num_workers': 4, 'pin_memory': True} if gpu >= 0 else {}
     train_loader = torch.utils.data.DataLoader(
         dataset_class(root, train=True, transform=True),
@@ -54,7 +54,7 @@ def main():
     # 2. model
 
     model = torchfcn.models.FCN32s(n_class=21)
-    pth_file = '/home/wkentaro/.torch/models/vgg16-00b39a1b.pth'
+    pth_file = osp.expanduser('~/data/models/torch/vgg16-00b39a1b.pth')
     vgg16 = torchvision.models.vgg16()
     vgg16.load_state_dict(torch.load(pth_file))
     for l1, l2 in zip(vgg16.features, model.features):

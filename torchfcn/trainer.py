@@ -130,7 +130,9 @@ class Trainer(object):
 
         n_class = len(self.train_loader.dataset.class_names)
 
-        for batch_idx, (data, target) in enumerate(self.train_loader):
+        for batch_idx, (data, target) in tqdm.tqdm(
+                enumerate(self.train_loader), total=len(self.train_loader),
+                desc='Train epoch=%d' % self.epoch, ncols=80, leave=False):
             self.iteration = batch_idx + self.epoch * len(self.train_loader)
 
             if self.device_ids[0] >= 0:

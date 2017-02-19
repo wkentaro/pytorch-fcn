@@ -4,3 +4,4 @@ Pillow
 scipy
 https://s3.amazonaws.com/pytorch/whl/cu80/torch-0.1.8.post1-cp27-none-linux_x86_64.whl
 torchvision
+tqdm

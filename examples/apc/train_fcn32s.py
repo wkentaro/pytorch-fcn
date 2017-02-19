@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import os.path as osp
 
 # FIXME: torch -> scipy.misc raises SEGV
 import scipy.misc  # NOQA
@@ -31,7 +32,7 @@ def main():
 
     # 1. dataset
 
-    root = '/home/wkentaro/.torch/datasets'
+    root = osp.expanduser('~/data/datasets')
     kwargs = {}
     if device_ids[0] >= 0:
         kwargs = {'num_workers': 4, 'pin_memory': True}
@@ -46,7 +47,7 @@ def main():
 
     n_class = len(train_loader.dataset.class_names)
     model = torchfcn.models.FCN32s(n_class=n_class)
-    pth_file = '/home/wkentaro/.torch/models/vgg16-00b39a1b.pth'
+    pth_file = osp.expanduser('~/data/models/torch/vgg16-00b39a1b.pth')
     vgg16 = torchvision.models.vgg16()
     vgg16.load_state_dict(torch.load(pth_file))
     for l1, l2 in zip(vgg16.features, model.features):

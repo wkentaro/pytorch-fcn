@@ -9,6 +9,7 @@ import scipy.misc
 import torch
 from torch.autograd import Variable
 import torch.nn.functional as F
+import tqdm
 
 
 class Trainer(object):
@@ -16,7 +17,6 @@ class Trainer(object):
     def __init__(self, device_ids, model, optimizer,
                  train_loader, val_loader, out, max_iter):
         self.device_ids = device_ids
-        assert len(self.device_ids) == 1  # TODO(wkentaro): support multi-gpu
 
         self.model = model
         self.optimizer = optimizer
@@ -59,7 +59,9 @@ class Trainer(object):
         val_loss = 0
         metrics = []
         visualizations = []
-        for batch_idx, (data, target) in enumerate(self.val_loader):
+        for batch_idx, (data, target) in tqdm.tqdm(
+                enumerate(self.val_loader), total=len(self.val_loader),
+                desc='Valid epoch=%d' % self.epoch, ncols=80, leave=False):
             if self.device_ids[0] >= 0:
                 data, target = data.cuda(), target.cuda()
             data, target = Variable(data, volatile=True), Variable(target)

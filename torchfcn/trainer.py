@@ -12,6 +12,21 @@ import torch.nn.functional as F
 import tqdm
 
 
+def cross_entropy_2d(input, target):
+    # input: (n, c, h, w), target: (n, h, w)
+    n, c, h, w = input.size()
+    # log_p: (n, c, h, w)
+    log_p = F.log_softmax(input)
+    # log_p: (n*h*w, c)
+    log_p = log_p.transpose(1, 2).transpose(2, 3).contiguous().view(-1, c)
+    log_p = log_p[target.view(n, h, w, 1).repeat(1, 1, 1, c) >= 0]
+    log_p = log_p.view(-1, c)
+    # target: (n*h*w,)
+    target = target[target >= 0]
+    loss = F.nll_loss(log_p, target, size_average=False)
+    return loss
+
+
 class Trainer(object):
 
     def __init__(self, device_ids, model, optimizer,
@@ -65,19 +80,11 @@ class Trainer(object):
             if self.device_ids[0] >= 0:
                 data, target = data.cuda(), target.cuda()
             data, target = Variable(data, volatile=True), Variable(target)
-            output = self.model(data)
-
-            n, c, h, w = output.size()
-            logit = output.transpose(1, 2).transpose(2, 3).contiguous()
-            labels = target
-            logit = logit[labels.view(n, h, w, 1).repeat(1, 1, 1, c) >= 0]
-            logit = logit.view(-1, c)
-            labels = labels[labels >= 0]
-            val_loss += F.cross_entropy(logit, labels,
-                                        size_average=False).data[0]
+            score = self.model(data)
+            val_loss += cross_entropy_2d(score, target).data[0]
 
             imgs = data.data.cpu()
-            lbl_pred = output.data.max(1)[1].cpu().numpy()[:, 0, :, :]
+            lbl_pred = score.data.max(1)[1].cpu().numpy()[:, 0, :, :]
             lbl_true = target.data.cpu()
             for img, lt, lp in zip(imgs, lbl_true, lbl_pred):
                 img, lt = self.val_loader.dataset.untransform(img, lt)
@@ -130,20 +137,14 @@ class Trainer(object):
                 data, target = data.cuda(), target.cuda()
             data, target = Variable(data), Variable(target)
             self.optimizer.zero_grad()
-            output = self.model(data)
+            score = self.model(data)
 
-            n, c, h, w = output.size()
-            logit = output.transpose(1, 2).transpose(2, 3).contiguous()
-            labels = target
-            logit = logit[labels.view(n, h, w, 1).repeat(1, 1, 1, c) >= 0]
-            logit = logit.view(-1, c)
-            labels = labels[labels >= 0]
-            loss = F.cross_entropy(logit, labels, size_average=False)
+            loss = cross_entropy_2d(score, target)
             loss.backward()
             self.optimizer.step()
 
             metrics = []
-            lbl_pred = output.data.max(1)[1].cpu().numpy()[:, 0, :, :]
+            lbl_pred = score.data.max(1)[1].cpu().numpy()[:, 0, :, :]
             lbl_true = target.data.cpu().numpy()
             for lt, lp in zip(lbl_true, lbl_pred):
                 acc, acc_cls, mean_iu, fwavacc = \

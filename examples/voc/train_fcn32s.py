@@ -3,7 +3,7 @@
 import argparse
 
 # FIXME: torch -> scipy.misc raises SEGV
-import scipy.misc
+import scipy.misc  # NOQA
 
 import torch
 import torch.optim as optim

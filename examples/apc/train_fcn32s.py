@@ -22,7 +22,7 @@ def main():
     out = args.out
 
     seed = 1
-    batch_size = len(device_ids) * 4
+    batch_size = len(device_ids) * 3
     max_iter = 150000 // batch_size
 
     torch.manual_seed(seed)

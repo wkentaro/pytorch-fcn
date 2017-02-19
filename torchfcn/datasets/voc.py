@@ -42,7 +42,7 @@ class VOCClassSegBase(data.Dataset):
         self._transform = transform
 
         dataset_dir = osp.join(
-            self.root, 'VOCdevkit/VOC%d' % year)
+            self.root, 'voc/VOCdevkit/VOC%d' % year)
         self.files = collections.defaultdict(list)
         for data_type in ['train', 'val']:
             imgsets_file = osp.join(

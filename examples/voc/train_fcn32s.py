@@ -58,13 +58,16 @@ def main():
     vgg16 = torchvision.models.vgg16()
     vgg16.load_state_dict(torch.load(pth_file))
     for l1, l2 in zip(vgg16.features, model.features):
-        try:
-            if l1.weight.size() == l2.weight.size():
-                l2.weight = l1.weight
-            if l1.bias.size() == l2.bias.size():
-                l2.bias = l1.bias
-        except AttributeError:
-            pass
+        if isinstance(l1, torch.nn.Conv2d) and isinstance(l2, torch.nn.Conv2d):
+            assert l1.weight.size() == l2.weight.size()
+            assert l1.bias.size() == l2.bias.size()
+            l2.weight.data = l1.weight.data
+            l2.bias.data = l1.bias.data
+    for i1, i2 in zip([1, 4], [0, 3]):
+        l1 = vgg16.classifier[i1]
+        l2 = model.segmenter[i2]
+        l2.weight.data = l1.weight.data.view(l2.weight.size())
+        l2.bias.data = l1.bias.data.view(l2.bias.size())
     if gpu >= 0:
         model = model.cuda()
 

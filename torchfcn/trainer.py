@@ -24,6 +24,7 @@ def cross_entropy_2d(input, target):
     # target: (n*h*w,)
     target = target[target >= 0]
     loss = F.nll_loss(log_p, target, size_average=False)
+    loss /= n
     return loss
 
 

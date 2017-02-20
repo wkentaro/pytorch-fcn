@@ -57,8 +57,9 @@ class Trainer(object):
             'valid/mean_iu',
             'valid/fwavacc',
         ]
-        with open(osp.join(self.out, 'log.csv'), 'w') as f:
-            f.write(','.join(self.log_headers) + '\n')
+        if not osp.exists(osp.join(self.out, 'log.csv')):
+            with open(osp.join(self.out, 'log.csv'), 'w') as f:
+                f.write(','.join(self.log_headers) + '\n')
 
         self.epoch = 0
         self.iteration = 0

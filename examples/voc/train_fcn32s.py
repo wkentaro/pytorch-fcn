@@ -19,11 +19,13 @@ def main():
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--year', type=int, default=2012, choices=(2011, 2012),
                         help='Year of VOC dataset (default: 2012)')
+    parser.add_argument('--resume')
     args = parser.parse_args()
 
     gpu = args.gpu
     year = args.year
     out = args.out
+    resume = args.resume
 
     seed = 1
     max_iter = 100000
@@ -55,20 +57,27 @@ def main():
     # 2. model
 
     model = torchfcn.models.FCN32s(n_class=21)
-    pth_file = osp.expanduser('~/data/models/torch/vgg16-00b39a1b.pth')
-    vgg16 = torchvision.models.vgg16()
-    vgg16.load_state_dict(torch.load(pth_file))
-    for l1, l2 in zip(vgg16.features, model.features):
-        if isinstance(l1, torch.nn.Conv2d) and isinstance(l2, torch.nn.Conv2d):
-            assert l1.weight.size() == l2.weight.size()
-            assert l1.bias.size() == l2.bias.size()
-            l2.weight.data = l1.weight.data
-            l2.bias.data = l1.bias.data
-    for i1, i2 in zip([1, 4], [0, 3]):
-        l1 = vgg16.classifier[i1]
-        l2 = model.segmenter[i2]
-        l2.weight.data = l1.weight.data.view(l2.weight.size())
-        l2.bias.data = l1.bias.data.view(l2.bias.size())
+    start_epoch = 0
+    if resume:
+        checkpoint = torch.load(resume)
+        model.load_state_dict(checkpoint['state_dict'])
+        start_epoch = checkpoint['epoch']
+    else:
+        pth_file = osp.expanduser('~/data/models/torch/vgg16-00b39a1b.pth')
+        vgg16 = torchvision.models.vgg16()
+        vgg16.load_state_dict(torch.load(pth_file))
+        for l1, l2 in zip(vgg16.features, model.features):
+            if (isinstance(l1, torch.nn.Conv2d) and
+                    isinstance(l2, torch.nn.Conv2d)):
+                assert l1.weight.size() == l2.weight.size()
+                assert l1.bias.size() == l2.bias.size()
+                l2.weight.data = l1.weight.data
+                l2.bias.data = l1.bias.data
+        for i1, i2 in zip([1, 4], [0, 3]):
+            l1 = vgg16.classifier[i1]
+            l2 = model.segmenter[i2]
+            l2.weight.data = l1.weight.data.view(l2.weight.size())
+            l2.bias.data = l1.bias.data.view(l2.bias.size())
     if gpu >= 0:
         model = model.cuda()
 
@@ -86,6 +95,8 @@ def main():
         out=out,
         max_iter=max_iter,
     )
+    trainer.epoch = start_epoch
+    trainer.iteration = start_epoch * len(train_loader)
     trainer.train()
 
 

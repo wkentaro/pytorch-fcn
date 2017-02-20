@@ -81,7 +81,11 @@ class Trainer(object):
                 data, target = data.cuda(), target.cuda()
             data, target = Variable(data, volatile=True), Variable(target)
             score = self.model(data)
-            val_loss += cross_entropy_2d(score, target).data[0]
+
+            loss = cross_entropy_2d(score, target)
+            if np.isnan(float(loss.data[0])):
+                raise ValueError('loss is nan while validating')
+            val_loss += float(loss.data[0])
 
             imgs = data.data.cpu()
             lbl_pred = score.data.max(1)[1].cpu().numpy()[:, 0, :, :]
@@ -142,6 +146,8 @@ class Trainer(object):
             score = self.model(data)
 
             loss = cross_entropy_2d(score, target)
+            if np.isnan(float(loss.data[0])):
+                raise ValueError('loss is nan while training')
             loss.backward()
             self.optimizer.step()
 
@@ -164,7 +170,7 @@ class Trainer(object):
                 break
 
     def train(self):
-        for epoch in itertools.count():
+        for epoch in itertools.count(self.epoch):
             self.epoch = epoch
             self.validate()
             if self.iteration >= self.max_iter:

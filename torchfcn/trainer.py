@@ -12,7 +12,7 @@ import torch.nn.functional as F
 import tqdm
 
 
-def cross_entropy_2d(input, target):
+def cross_entropy_2d(input, target, weight=None, size_average=True):
     # input: (n, c, h, w), target: (n, h, w)
     n, c, h, w = input.size()
     # log_p: (n, c, h, w)
@@ -22,9 +22,13 @@ def cross_entropy_2d(input, target):
     log_p = log_p[target.view(n, h, w, 1).repeat(1, 1, 1, c) >= 0]
     log_p = log_p.view(-1, c)
     # target: (n*h*w,)
-    target = target[target >= 0]
-    loss = F.nll_loss(log_p, target, size_average=False)
-    loss /= n
+    mask = target >= 0
+    target = target[mask]
+    loss = F.nll_loss(log_p, target, weight=weight, size_average=False)
+    if size_average:
+        loss /= mask.sum().data[0] * n
+    else:
+        loss /= n
     return loss
 
 
@@ -84,7 +88,7 @@ class Trainer(object):
             data, target = Variable(data, volatile=True), Variable(target)
             score = self.model(data)
 
-            loss = cross_entropy_2d(score, target)
+            loss = cross_entropy_2d(score, target, size_average=False)
             if np.isnan(float(loss.data[0])):
                 raise ValueError('loss is nan while validating')
             val_loss += float(loss.data[0])
@@ -147,7 +151,7 @@ class Trainer(object):
             self.optimizer.zero_grad()
             score = self.model(data)
 
-            loss = cross_entropy_2d(score, target)
+            loss = cross_entropy_2d(score, target, size_average=False)
             if np.isnan(float(loss.data[0])):
                 raise ValueError('loss is nan while training')
             loss.backward()

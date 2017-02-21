@@ -4,6 +4,12 @@
 Fully Convolutional Networks implemented with PyTorch.
 
 
+## TODO
+
+- Reproduce result in original paper ([wkentaro/fcn#79](https://github.com/wkentaro/fcn/issues/79))
+- Support FCN16s and FCN8s.
+
+
 ## Accuracy
 
 **FCN32s on VOC2012**

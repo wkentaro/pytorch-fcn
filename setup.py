@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name='torchfcn',
-    version='0.1',
+    version='0.2',
     packages=find_packages(),
     author='Kentaro Wada',
     author_email='www.kentaro.wada@gmail.com',

@@ -13,9 +13,9 @@ Fully Convolutional Networks implemented with PyTorch.
 
 |   epoch |   iteration |   valid/loss |   valid/acc |   valid/acc_cls |   valid/mean_iu |   valid/fwavacc |
 |--------:|------------:|-------------:|------------:|----------------:|----------------:|----------------:|
-|      58 |       84912 |       121321 |    0.868776 |        0.746134 |        0.412695 |        0.821124 |
+|      54 |       79056 |       124415 |    0.877290 |        0.733036 |        0.479087 |        0.817315 |
 
-<img src="_static/fcn32s_voc2012_epoch58.jpg" width="40%" />
+<img src="_static/fcn32s_voc2012_best_epoch54.jpg" width="40%" />
 <img src="_static/fcn32s_voc2012_visualization_val.gif" width="40%" />
 
 

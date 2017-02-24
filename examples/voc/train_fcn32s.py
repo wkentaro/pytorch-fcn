@@ -83,10 +83,10 @@ def main():
         l2.bias.data = l1.bias.data[:n_class]
         # initialize upscore layer
         upscore = model.segmenter[7]
-        h, w, c1, c2 = upscore.weight.data.size()
+        c1, c2, h, w = upscore.weight.data.size()
         assert h == w
         weight = torchfcn.utils.get_upsample_filter(h)
-        upscore.weight.data = weight.view(h, w, 1, 1).repeat(1, 1, c1, c2)
+        upscore.weight.data = weight.view(1, 1, h, w).repeat(c1, c2, 1, 1)
     if cuda:
         model = model.cuda()
 

@@ -78,6 +78,11 @@ def main():
             l2 = model.segmenter[i2]
             l2.weight.data = l1.weight.data.view(l2.weight.size())
             l2.bias.data = l1.bias.data.view(l2.bias.size())
+        upscore = model.segmenter[7]
+        h, w, c1, c2 = upscore.weight.data.size()
+        assert h == w
+        weight = torchfcn.utils.get_upsample_filter(h)
+        upscore.weight.data = weight.view(h, w, 1, 1).repeat(1, 1, c1, c2)
     if gpu >= 0:
         model = model.cuda()
 

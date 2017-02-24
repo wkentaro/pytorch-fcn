@@ -34,9 +34,9 @@ def cross_entropy2d(input, target, weight=None, size_average=True):
 
 class Trainer(object):
 
-    def __init__(self, device_ids, model, optimizer,
+    def __init__(self, cuda, model, optimizer,
                  train_loader, val_loader, out, max_iter):
-        self.device_ids = device_ids
+        self.cuda = cuda
 
         self.model = model
         self.optimizer = optimizer
@@ -83,7 +83,7 @@ class Trainer(object):
         for batch_idx, (data, target) in tqdm.tqdm(
                 enumerate(self.val_loader), total=len(self.val_loader),
                 desc='Valid epoch=%d' % self.epoch, ncols=80, leave=False):
-            if self.device_ids[0] >= 0:
+            if self.cuda:
                 data, target = data.cuda(), target.cuda()
             data, target = Variable(data, volatile=True), Variable(target)
             score = self.model(data)
@@ -145,7 +145,7 @@ class Trainer(object):
                 desc='Train epoch=%d' % self.epoch, ncols=80, leave=False):
             self.iteration = batch_idx + self.epoch * len(self.train_loader)
 
-            if self.device_ids[0] >= 0:
+            if self.cuda:
                 data, target = data.cuda(), target.cuda()
             data, target = Variable(data), Variable(target)
             self.optimizer.zero_grad()

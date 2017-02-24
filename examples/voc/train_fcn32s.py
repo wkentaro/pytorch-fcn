@@ -16,13 +16,13 @@ import torchfcn
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--out')
-    parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--year', type=int, default=2012, choices=(2011, 2012),
                         help='Year of VOC dataset (default: 2012)')
     parser.add_argument('--resume')
     args = parser.parse_args()
 
-    gpu = args.gpu
+    cuda = torch.cuda.is_available()
+
     year = args.year
     out = args.out
     resume = args.resume
@@ -31,10 +31,8 @@ def main():
     max_iter = 100000
 
     torch.manual_seed(seed)
-    if gpu >= 0:
+    if cuda:
         torch.cuda.manual_seed(seed)
-
-    torch.cuda.set_device(gpu)
 
     # 1. dataset
 
@@ -46,7 +44,7 @@ def main():
         raise ValueError
 
     root = osp.expanduser('~/data/datasets')
-    kwargs = {'num_workers': 4, 'pin_memory': True} if gpu >= 0 else {}
+    kwargs = {'num_workers': 4, 'pin_memory': True} if cuda else {}
     train_loader = torch.utils.data.DataLoader(
         dataset_class(root, train=True, transform=True),
         batch_size=1, shuffle=True, **kwargs)
@@ -89,7 +87,7 @@ def main():
         assert h == w
         weight = torchfcn.utils.get_upsample_filter(h)
         upscore.weight.data = weight.view(h, w, 1, 1).repeat(1, 1, c1, c2)
-    if gpu >= 0:
+    if cuda:
         model = model.cuda()
 
     # 3. optimizer
@@ -98,7 +96,7 @@ def main():
                           weight_decay=0.0005)
 
     trainer = torchfcn.Trainer(
-        device_ids=[gpu],
+        cuda=cuda,
         model=model,
         optimizer=optimizer,
         train_loader=train_loader,

@@ -7,7 +7,6 @@ import os.path as osp
 import scipy.misc  # NOQA
 
 import torch
-import torch.optim as optim
 import torchvision
 
 import torchfcn
@@ -58,7 +57,7 @@ def main():
     start_epoch = 0
     if resume:
         checkpoint = torch.load(resume)
-        model.load_state_dict(checkpoint['state_dict'])
+        model.load_state_dict(checkpoint['model_state_dict'])
         start_epoch = checkpoint['epoch']
     else:
         pth_file = osp.expanduser('~/data/models/torch/vgg16-00b39a1b.pth')
@@ -92,13 +91,15 @@ def main():
 
     # 3. optimizer
 
-    optimizer = optim.SGD(model.parameters(), lr=1e-10, momentum=0.99,
-                          weight_decay=0.0005)
+    optim = torch.optim.SGD(model.parameters(), lr=1e-10,
+                            momentum=0.99, weight_decay=0.0005)
+    if resume:
+        optim.load_state_dict(checkpoint['optim_state_dict'])
 
     trainer = torchfcn.Trainer(
         cuda=cuda,
         model=model,
-        optimizer=optimizer,
+        optimizer=optim,
         train_loader=train_loader,
         val_loader=val_loader,
         out=out,

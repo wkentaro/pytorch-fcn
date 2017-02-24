@@ -37,7 +37,7 @@ class Trainer(object):
         self.cuda = cuda
 
         self.model = model
-        self.optimizer = optimizer
+        self.optim = optimizer
 
         self.train_loader = train_loader
         self.val_loader = val_loader
@@ -126,7 +126,8 @@ class Trainer(object):
         torch.save({
             'epoch': self.epoch,
             'arch': self.model.__class__.__name__,
-            'state_dict': self.model.state_dict(),
+            'optim_state_dict': self.optim.state_dict(),
+            'model_state_dict': self.model.state_dict(),
             'best_mean_iu': self.best_mean_iu,
         }, osp.join(self.out, 'checkpoint.pth.tar'))
         if is_best:
@@ -146,14 +147,14 @@ class Trainer(object):
             if self.cuda:
                 data, target = data.cuda(), target.cuda()
             data, target = Variable(data), Variable(target)
-            self.optimizer.zero_grad()
+            self.optim.zero_grad()
             score = self.model(data)
 
             loss = cross_entropy2d(score, target, size_average=False)
             if np.isnan(float(loss.data[0])):
                 raise ValueError('loss is nan while training')
             loss.backward()
-            self.optimizer.step()
+            self.optim.step()
 
             metrics = []
             lbl_pred = score.data.max(1)[1].cpu().numpy()[:, 0, :, :]

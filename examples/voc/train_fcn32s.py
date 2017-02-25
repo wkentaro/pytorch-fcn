@@ -82,22 +82,25 @@ def main():
 
     # 3. optimizer
 
-    conv_weights = []
-    conv_biases = []
-    for l in model.features:
-        for i, param in enumerate(l.parameters()):
-            if i == 0:
-                conv_weights.append(param)
-            elif i == 1:
-                conv_biases.append(param)
-            else:
-                raise ValueError
+    # FIXME: Per-parameter options not work? No loss discreasing.
+    # conv_weights = []
+    # conv_biases = []
+    # for l in model.features:
+    #     for i, param in enumerate(l.parameters()):
+    #         if i == 0:
+    #             conv_weights.append(param)
+    #         elif i == 1:
+    #             conv_biases.append(param)
+    #         else:
+    #             raise ValueError
     optim = torch.optim.SGD(
-        [
-            {'params': conv_weights},  # weights
-            {'params': conv_biases, 'lr': 2e-10, 'weight_decay': 0},  # biases
-            {'params': model.upscore.parameters(), 'lr': 0},  # deconv
-        ],
+        # FIXME: Per-parameter options not work? No loss discreasing.
+        # [
+        #     {'params': conv_weights},
+        #     {'params': conv_biases, 'lr': 2e-10, 'weight_decay': 0},
+        #     {'params': model.upscore.parameters(), 'lr': 0},  # deconv
+        # ],
+        model.parameters(),
         lr=1e-10, momentum=0.99, weight_decay=0.0005)
     if resume:
         optim.load_state_dict(checkpoint['optim_state_dict'])

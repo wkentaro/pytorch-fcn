@@ -74,4 +74,4 @@ class FCN32s(nn.Module):
         h = self.upscore(h)
         h = h[:, :, 19:19+x.size()[2], 19:19+x.size()[3]].contiguous()
 
-        return z
+        return h

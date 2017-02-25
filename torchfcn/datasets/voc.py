@@ -43,6 +43,7 @@ class VOCClassSegBase(data.Dataset):
         self.split = split
         self._transform = transform
 
+        pkg_root = pkg_resources.get_distribution('torchfcn').location
         dataset_dir = osp.join(
             self.root, 'voc/VOCdevkit/VOC%d' % year)
         self.files = collections.defaultdict(list)
@@ -102,6 +103,14 @@ class VOC2011ClassSeg(VOCClassSegBase):
     url = 'http://host.robots.ox.ac.uk/pascal/VOC/voc2011/VOCtrainval_25-May-2011.tar'  # NOQA
 
     def __init__(self, root, split='train', transform=False):
+        imgsets_file = osp.join(
+            pkg_root, 'torchfcn/ext/fcn.berkeleyvision.org',
+            'data/pascal/seg11valid.txt')
+        for did in open(imgsets_file):
+            did = did.strip()
+            img_file = osp.join(dataset_dir, 'JPEGImages/%s.jpg' % did)
+            lbl_file = osp.join(dataset_dir, 'SegmentationClass/%s.png' % did)
+            self.files['seg11valid'].append({'img': img_file, 'lbl': lbl_file})
         super(VOC2011ClassSeg, self).__init__(
             root, year=2011, split=split, transform=transform)
 
@@ -125,17 +134,10 @@ class SBDClassSeg(VOCClassSegBase):
         self.split = split
         self._transform = transform
 
-        pkg_root = pkg_resources.get_distribution('torchfcn').location
-
         dataset_dir = osp.join(self.root, 'voc/benchmark_RELEASE/dataset')
         self.files = collections.defaultdict(list)
-        for split in ['train', 'val', 'seg11valid']:
-            if split in ['train', 'val']:
-                imgsets_file = osp.join(dataset_dir, '%s.txt' % split)
-            else:
-                imgsets_file = osp.join(
-                    pkg_root, 'torchfcn/ext/fcn.berkeleyvision.org',
-                    'data/pascal/seg11valid.txt')
+        for split in ['train', 'val']:
+            imgsets_file = osp.join(dataset_dir, '%s.txt' % split)
             for did in open(imgsets_file):
                 did = did.strip()
                 img_file = osp.join(dataset_dir, 'img/%s.jpg' % did)

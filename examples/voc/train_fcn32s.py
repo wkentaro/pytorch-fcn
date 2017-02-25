@@ -15,14 +15,11 @@ import torchfcn
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--out')
-    parser.add_argument('--year', type=int, default=2012, choices=(2011, 2012),
-                        help='Year of VOC dataset (default: 2012)')
     parser.add_argument('--resume')
     args = parser.parse_args()
 
     cuda = torch.cuda.is_available()
 
-    year = args.year
     out = args.out
     resume = args.resume
 
@@ -35,20 +32,14 @@ def main():
 
     # 1. dataset
 
-    if year == 2011:
-        dataset_class = torchfcn.datasets.VOC2011ClassSeg
-    elif year == 2012:
-        dataset_class = torchfcn.datasets.VOC2012ClassSeg
-    else:
-        raise ValueError
-
     root = osp.expanduser('~/data/datasets')
     kwargs = {'num_workers': 4, 'pin_memory': True} if cuda else {}
     train_loader = torch.utils.data.DataLoader(
-        dataset_class(root, train=True, transform=True),
+        torchfcn.datasets.SBDClassSeg(root, split='train', transform=True),
         batch_size=1, shuffle=True, **kwargs)
     val_loader = torch.utils.data.DataLoader(
-        dataset_class(root, train=False, transform=True),
+        torchfcn.datasets.VOC2011ClassSeg(root, split='seg11valid',
+                                          transform=True),
         batch_size=1, shuffle=False, **kwargs)
 
     # 2. model

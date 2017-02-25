@@ -43,7 +43,6 @@ class VOCClassSegBase(data.Dataset):
         self.split = split
         self._transform = transform
 
-        pkg_root = pkg_resources.get_distribution('torchfcn').location
         dataset_dir = osp.join(
             self.root, 'voc/VOCdevkit/VOC%d' % year)
         self.files = collections.defaultdict(list)
@@ -103,6 +102,7 @@ class VOC2011ClassSeg(VOCClassSegBase):
     url = 'http://host.robots.ox.ac.uk/pascal/VOC/voc2011/VOCtrainval_25-May-2011.tar'  # NOQA
 
     def __init__(self, root, split='train', transform=False):
+        pkg_root = pkg_resources.get_distribution('torchfcn').location
         imgsets_file = osp.join(
             pkg_root, 'torchfcn/ext/fcn.berkeleyvision.org',
             'data/pascal/seg11valid.txt')

@@ -82,15 +82,21 @@ def main():
 
     # 3. optimizer
 
+    conv_weights = []
+    conv_biases = []
+    for l in model.features:
+        for i, param in enumerate(l.parameters()):
+            if i == 0:
+                conv_weights.append(param)
+            elif i == 1:
+                conv_biases.append(param)
+            else:
+                raise ValueError
     optim = torch.optim.SGD(
         [
-            # conv weight
-            {'params': [l.parameters()[0] for l in model.features]},
-            # conv bias
-            {'params': [l.parameters()[1] for l in model.features],
-             'lr': 2e-10, 'weight_decay': 0},
-            # deconv
-            {'params': model.upscore.parameters(), 'lr': 0},
+            {'params': conv_weights},  # weights
+            {'params': conv_biases, 'lr': 2e-10, 'weight_decay': 0},  # biases
+            {'params': model.upscore.parameters(), 'lr': 0},  # deconv
         ],
         lr=1e-10, momentum=0.99, weight_decay=0.0005)
     if resume:

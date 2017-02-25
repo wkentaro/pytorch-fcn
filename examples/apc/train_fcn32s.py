@@ -16,26 +16,23 @@ import torchfcn
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--out')
-    parser.add_argument('--gpu', type=int, nargs='+', default=[0])
     args = parser.parse_args()
 
-    device_ids = args.gpu
     out = args.out
+    cuda = torch.cuda.is_available()
 
     seed = 1
-    batch_size = len(device_ids) * 3
+    batch_size = torch.cuda.device_count() * 3
     max_iter = 150000 // batch_size
 
     torch.manual_seed(seed)
-    if device_ids[0] >= 0:
+    if cuda:
         torch.cuda.manual_seed(seed)
 
     # 1. dataset
 
     root = osp.expanduser('~/data/datasets')
-    kwargs = {}
-    if device_ids[0] >= 0:
-        kwargs = {'num_workers': 4, 'pin_memory': True}
+    kwargs = {'num_workers': 4, 'pin_memory': True} if cuda else {}
     train_loader = torch.utils.data.DataLoader(
         torchfcn.datasets.APC2016V2(root, train=True, transform=True),
         batch_size=batch_size, shuffle=True, **kwargs)
@@ -58,22 +55,21 @@ def main():
             l2.bias.data = l1.bias.data
     for i1, i2 in zip([1, 4], [0, 3]):
         l1 = vgg16.classifier[i1]
-        l2 = model.segmenter[i2]
+        l2 = model.classifier[i2]
         l2.weight.data = l1.weight.data.view(l2.weight.size())
         l2.bias.data = l1.bias.data.view(l2.bias.size())
-    if device_ids[0] >= 0:
-        if len(device_ids) == 1:
-            torch.cuda.set_device(device_ids[0])
+    if cuda:
+        if torch.cuda.device_count() == 1:
             model = model.cuda()
         else:
-            model = torch.nn.DataParallel(model, device_ids=device_ids).cuda()
+            model = torch.nn.DataParallel(model).cuda()
 
     # 3. optimizer
 
     optimizer = optim.Adam(model.parameters(), lr=1e-5, weight_decay=0.0005)
 
     trainer = torchfcn.Trainer(
-        device_ids=device_ids,
+        cuda=cuda,
         model=model,
         optimizer=optimizer,
         train_loader=train_loader,

@@ -5,6 +5,8 @@ import os.path as osp
 
 import numpy as np
 import PIL.Image
+import pkg_resources
+import scipy.io
 import torch
 from torch.utils import data
 
@@ -36,34 +38,32 @@ class VOCClassSegBase(data.Dataset):
     ])
     mean_bgr = np.array([104.00698793, 116.66876762, 122.67891434])
 
-    def __init__(self, root, year, train=True, transform=False):
+    def __init__(self, root, year, split='train', transform=False):
         self.root = root
-        self.train = train
+        self.split = split
         self._transform = transform
 
         dataset_dir = osp.join(
             self.root, 'voc/VOCdevkit/VOC%d' % year)
         self.files = collections.defaultdict(list)
-        for data_type in ['train', 'val']:
+        for split in ['train', 'val']:
             imgsets_file = osp.join(
-                dataset_dir, 'ImageSets/Segmentation/%s.txt' % data_type)
+                dataset_dir, 'ImageSets/Segmentation/%s.txt' % split)
             for did in open(imgsets_file):
                 did = did.strip()
                 img_file = osp.join(dataset_dir, 'JPEGImages/%s.jpg' % did)
                 lbl_file = osp.join(
                     dataset_dir, 'SegmentationClass/%s.png' % did)
-                self.files[data_type].append({
+                self.files[split].append({
                     'img': img_file,
                     'lbl': lbl_file,
                 })
 
     def __len__(self):
-        data_type = 'train' if self.train else 'val'
-        return len(self.files[data_type])
+        return len(self.files[self.split])
 
     def __getitem__(self, index):
-        data_type = 'train' if self.train else 'val'
-        data_file = self.files[data_type][index]
+        data_file = self.files[self.split][index]
         # load image
         img_file = data_file['img']
         img = PIL.Image.open(img_file)
@@ -101,15 +101,62 @@ class VOC2011ClassSeg(VOCClassSegBase):
 
     url = 'http://host.robots.ox.ac.uk/pascal/VOC/voc2011/VOCtrainval_25-May-2011.tar'  # NOQA
 
-    def __init__(self, root, train=True, transform=False):
+    def __init__(self, root, split='train', transform=False):
         super(VOC2011ClassSeg, self).__init__(
-            root, year=2011, train=train, transform=transform)
+            root, year=2011, split=split, transform=transform)
 
 
 class VOC2012ClassSeg(VOCClassSegBase):
 
     url = 'http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar'  # NOQA
 
-    def __init__(self, root, train=True, transform=False):
+    def __init__(self, root, split='train', transform=False):
         super(VOC2012ClassSeg, self).__init__(
-            root, year=2012, train=train, transform=transform)
+            root, year=2012, split=split, transform=transform)
+
+
+class SBDClassSeg(VOCClassSegBase):
+
+    # XXX: It must be renamed to benchmark.tar to be extracted.
+    url = 'http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/semantic_contours/benchmark.tgz'
+
+    def __init__(self, root, split='train', transform=False):
+        self.root = root
+        self.split = split
+        self._transform = transform
+
+        pkg_root = pkg_resources.get_distribution('torchfcn').location
+
+        dataset_dir = osp.join(self.root, 'voc/benchmark_RELEASE/dataset')
+        self.files = collections.defaultdict(list)
+        for split in ['train', 'val', 'seg11valid']:
+            if split in ['train', 'val']:
+                imgsets_file = osp.join(dataset_dir, '%s.txt' % split)
+            else:
+                imgsets_file = osp.join(
+                    pkg_root, 'torchfcn/ext/fcn.berkeleyvision.org',
+                    'data/pascal/seg11valid.txt')
+            for did in open(imgsets_file):
+                did = did.strip()
+                img_file = osp.join(dataset_dir, 'img/%s.jpg' % did)
+                lbl_file = osp.join(dataset_dir, 'cls/%s.mat' % did)
+                self.files[split].append({
+                    'img': img_file,
+                    'lbl': lbl_file,
+                })
+
+    def __getitem__(self, index):
+        data_file = self.files[self.split][index]
+        # load image
+        img_file = data_file['img']
+        img = PIL.Image.open(img_file)
+        img = np.array(img, dtype=np.uint8)
+        # load label
+        lbl_file = data_file['lbl']
+        mat = scipy.io.loadmat(lbl_file)
+        lbl = mat['GTcls'][0]['Segmentation'][0].astype(np.int32)
+        lbl[lbl == 255] = -1
+        if self._transform:
+            return self.transform(img, lbl)
+        else:
+            return img, lbl

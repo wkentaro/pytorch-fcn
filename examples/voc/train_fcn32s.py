@@ -91,8 +91,17 @@ def main():
 
     # 3. optimizer
 
-    optim = torch.optim.SGD(model.parameters(), lr=1e-10,
-                            momentum=0.99, weight_decay=0.0005)
+    optim = torch.optim.SGD(
+        [
+            # conv weight
+            {'params': [l.parameters()[0] l for model.features]},
+            # conv bias
+            {'params': [l.parameters()[1] l for model.features],
+             'lr': 2e-10, 'weight_decay': 0},
+            # deconv
+            {'params': model.upscore.parameters() 'lr': 0},
+        ],
+        lr=1e-10, momentum=0.99, weight_decay=0.0005)
     if resume:
         optim.load_state_dict(checkpoint['optim_state_dict'])
 

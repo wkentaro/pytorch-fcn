@@ -47,7 +47,7 @@ class FCN32s(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/32
         )
-        self.segmenter = nn.Sequential(
+        self.classifier = nn.Sequential(
             # fc6
             nn.Conv2d(512, 4096, 7),
             nn.ReLU(inplace=True),
@@ -60,15 +60,18 @@ class FCN32s(nn.Module):
 
             # score_fr
             nn.Conv2d(4096, n_class, 1),
-
+        )
+        self.upscore = nn.Sequential(
             # upscore
             nn.ConvTranspose2d(n_class, n_class, 64, stride=32, bias=False),
         )
 
     def forward(self, x):
-        y = self.features(x)
+        h = self.features(x)
 
-        z = self.segmenter(y)
-        z = z[:, :, 19:19+x.size()[2], 19:19+x.size()[3]].contiguous()
+        h = self.classifier(h)
+
+        h = self.upscore(h)
+        h = h[:, :, 19:19+x.size()[2], 19:19+x.size()[3]].contiguous()
 
         return z

@@ -101,18 +101,18 @@ class VOC2011ClassSeg(VOCClassSegBase):
     url = 'http://host.robots.ox.ac.uk/pascal/VOC/voc2011/VOCtrainval_25-May-2011.tar'  # NOQA
 
     def __init__(self, root, split='train', transform=False):
+        super(VOC2011ClassSeg, self).__init__(
+            root, year=2011, split=split, transform=transform)
         pkg_root = osp.join(osp.dirname(osp.realpath(__file__)), '..')
         imgsets_file = osp.join(
             pkg_root, 'ext/fcn.berkeleyvision.org',
             'data/pascal/seg11valid.txt')
-        dataset_dir = osp.join(self.root, 'voc/VOCdevkit/VOC%d' % year)
+        dataset_dir = osp.join(self.root, 'voc/VOCdevkit/VOC2011')
         for did in open(imgsets_file):
             did = did.strip()
             img_file = osp.join(dataset_dir, 'JPEGImages/%s.jpg' % did)
             lbl_file = osp.join(dataset_dir, 'SegmentationClass/%s.png' % did)
             self.files['seg11valid'].append({'img': img_file, 'lbl': lbl_file})
-        super(VOC2011ClassSeg, self).__init__(
-            root, year=2011, split=split, transform=transform)
 
 
 class VOC2012ClassSeg(VOCClassSegBase):

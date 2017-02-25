@@ -63,16 +63,16 @@ def main():
                 l2.bias.data = l1.bias.data
         for i1, i2 in zip([1, 4], [0, 3]):
             l1 = vgg16.classifier[i1]
-            l2 = model.segmenter[i2]
+            l2 = model.classifier[i2]
             l2.weight.data = l1.weight.data.view(l2.weight.size())
             l2.bias.data = l1.bias.data.view(l2.bias.size())
         l1 = vgg16.classifier[6]
-        l2 = model.segmenter[6]
+        l2 = model.classifier[6]
         n_class = l2.weight.size()[0]
         l2.weight.data = l1.weight.data[:n_class, :].view(l2.weight.size())
         l2.bias.data = l1.bias.data[:n_class]
         # initialize upscore layer
-        upscore = model.segmenter[7]
+        upscore = model.upscore[0]
         c1, c2, h, w = upscore.weight.data.size()
         assert h == w
         weight = torchfcn.utils.get_upsample_filter(h)

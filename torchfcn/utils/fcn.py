@@ -17,16 +17,17 @@ def copy_params_vgg16_to_fcn32s(vgg16, fcn32s,
         l2 = fcn32s.classifier[i2]
         l2.weight.data = l1.weight.data.view(l2.weight.size())
         l2.bias.data = l1.bias.data.view(l2.bias.size())
+    n_class = l2.weight.size()[0]
     if copy_fc8:
         l1 = vgg16.classifier[6]
         l2 = fcn32s.classifier[6]
-        n_class = l2.weight.size()[0]
         l2.weight.data = l1.weight.data[:n_class, :].view(l2.weight.size())
         l2.bias.data = l1.bias.data[:n_class]
     if init_upscore:
         # initialize upscore layer
         upscore = fcn32s.upscore[0]
         c1, c2, h, w = upscore.weight.data.size()
+        assert c1 == c2 == n_class
         assert h == w
         weight = conv.get_upsample_filter(h)
         upscore.weight.data = weight.view(1, 1, h, w).repeat(c1, c2, 1, 1)

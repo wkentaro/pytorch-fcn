@@ -22,8 +22,8 @@ def main():
     cuda = torch.cuda.is_available()
 
     seed = 1
-    batch_size = torch.cuda.device_count() * 3
-    max_iter = 150000 // batch_size
+    batch_size = 1
+    max_iter = 100000
 
     torch.manual_seed(seed)
     if cuda:

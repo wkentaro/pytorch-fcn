@@ -3,9 +3,6 @@
 import argparse
 import os.path as osp
 
-# FIXME: torch -> scipy.misc raises SEGV
-import scipy.misc  # NOQA
-
 import torch
 import torchvision
 
@@ -38,8 +35,8 @@ def main():
         torchfcn.datasets.SBDClassSeg(root, split='train', transform=True),
         batch_size=1, shuffle=True, **kwargs)
     val_loader = torch.utils.data.DataLoader(
-        torchfcn.datasets.VOC2011ClassSeg(root, split='seg11valid',
-                                          transform=True),
+        torchfcn.datasets.VOC2011ClassSeg(
+            root, split='seg11valid', transform=True),
         batch_size=1, shuffle=False, **kwargs)
 
     # 2. model
@@ -54,29 +51,7 @@ def main():
         pth_file = osp.expanduser('~/data/models/torch/vgg16-00b39a1b.pth')
         vgg16 = torchvision.models.vgg16()
         vgg16.load_state_dict(torch.load(pth_file))
-        for l1, l2 in zip(vgg16.features, model.features):
-            if (isinstance(l1, torch.nn.Conv2d) and
-                    isinstance(l2, torch.nn.Conv2d)):
-                assert l1.weight.size() == l2.weight.size()
-                assert l1.bias.size() == l2.bias.size()
-                l2.weight.data = l1.weight.data
-                l2.bias.data = l1.bias.data
-        for i1, i2 in zip([1, 4], [0, 3]):
-            l1 = vgg16.classifier[i1]
-            l2 = model.classifier[i2]
-            l2.weight.data = l1.weight.data.view(l2.weight.size())
-            l2.bias.data = l1.bias.data.view(l2.bias.size())
-        l1 = vgg16.classifier[6]
-        l2 = model.classifier[6]
-        n_class = l2.weight.size()[0]
-        l2.weight.data = l1.weight.data[:n_class, :].view(l2.weight.size())
-        l2.bias.data = l1.bias.data[:n_class]
-        # initialize upscore layer
-        upscore = model.upscore[0]
-        c1, c2, h, w = upscore.weight.data.size()
-        assert h == w
-        weight = torchfcn.utils.get_upsample_filter(h)
-        upscore.weight.data = weight.view(1, 1, h, w).repeat(c1, c2, 1, 1)
+        torchfcn.utils.copy_params_vgg16_to_fcn32s(vgg16, model)
     if cuda:
         model = model.cuda()
 

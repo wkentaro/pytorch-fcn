@@ -17,7 +17,7 @@ def copy_params_vgg16_to_fcn32s(vgg16, fcn32s,
         l2 = fcn32s.classifier[i2]
         l2.weight.data = l1.weight.data.view(l2.weight.size())
         l2.bias.data = l1.bias.data.view(l2.bias.size())
-    n_class = l2.weight.size()[0]
+    n_class = fcn32s.classifier[6].weight.size()[0]
     if copy_fc8:
         l1 = vgg16.classifier[6]
         l2 = fcn32s.classifier[6]

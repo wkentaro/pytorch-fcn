@@ -20,7 +20,7 @@ def main():
     cuda = torch.cuda.is_available()
 
     seed = 1
-    batch_size = 1
+    batch_size = torch.cuda.device_count() * 3
     max_iter = 100000 // batch_size
 
     torch.manual_seed(seed)

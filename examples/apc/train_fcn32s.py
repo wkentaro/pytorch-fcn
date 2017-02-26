@@ -60,7 +60,7 @@ def main():
 
     # 3. optimizer
 
-    optim = torch.optim.Adam(model.parameters(), lr=1e-5, weight_decay=0.0005)
+    optim = torch.optim.Adam(model.parameters(), lr=1e-10, weight_decay=0.0005)
     if resume:
         optim.load_state_dict(checkpoint['optim_state_dict'])
 

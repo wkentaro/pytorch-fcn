@@ -21,7 +21,7 @@ def main():
 
     seed = 1
     batch_size = torch.cuda.device_count() * 3
-    max_iter = 100000 // batch_size
+    max_iter = 150000 // batch_size
 
     torch.manual_seed(seed)
     if cuda:
@@ -51,7 +51,8 @@ def main():
         pth_file = osp.expanduser('~/data/models/torch/vgg16-00b39a1b.pth')
         vgg16 = torchvision.models.vgg16()
         vgg16.load_state_dict(torch.load(pth_file))
-        torchfcn.utils.copy_params_vgg16_to_fcn32s(vgg16, model)
+        torchfcn.utils.copy_params_vgg16_to_fcn32s(
+            vgg16, model, copy_fc8=False, init_upscore=False)
     if cuda:
         if torch.cuda.device_count() == 1:
             model = model.cuda()
@@ -60,7 +61,7 @@ def main():
 
     # 3. optimizer
 
-    optim = torch.optim.Adam(model.parameters(), lr=1e-10, weight_decay=0.0005)
+    optim = torch.optim.Adam(model.parameters(), lr=1e-5, weight_decay=0.0005)
     if resume:
         optim.load_state_dict(checkpoint['optim_state_dict'])
 

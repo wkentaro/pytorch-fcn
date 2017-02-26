@@ -52,7 +52,7 @@ def main():
         vgg16 = torchvision.models.vgg16()
         vgg16.load_state_dict(torch.load(pth_file))
         torchfcn.utils.copy_params_vgg16_to_fcn32s(
-            vgg16, model, copy_fc8=False, init_upscore=False)
+            vgg16, model, copy_fc8=True, init_upscore=False)
     if cuda:
         if torch.cuda.device_count() == 1:
             model = model.cuda()

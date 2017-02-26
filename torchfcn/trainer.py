@@ -89,7 +89,7 @@ class Trainer(object):
             loss = cross_entropy2d(score, target, size_average=False)
             if np.isnan(float(loss.data[0])):
                 raise ValueError('loss is nan while validating')
-            val_loss += float(loss.data[0])
+            val_loss += float(loss.data[0]) / len(data)
 
             imgs = data.data.cpu()
             lbl_pred = score.data.max(1)[1].cpu().numpy()[:, 0, :, :]
@@ -151,6 +151,7 @@ class Trainer(object):
             score = self.model(data)
 
             loss = cross_entropy2d(score, target, size_average=False)
+            loss /= len(data)
             if np.isnan(float(loss.data[0])):
                 raise ValueError('loss is nan while training')
             loss.backward()

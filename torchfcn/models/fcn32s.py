@@ -3,7 +3,7 @@ import torch.nn as nn
 
 class FCN32s(nn.Module):
 
-    def __init__(self, n_class=21):
+    def __init__(self, n_class=21, deconv=True):
         super(FCN32s, self).__init__()
         self.features = nn.Sequential(
             # conv1
@@ -61,10 +61,12 @@ class FCN32s(nn.Module):
             # score_fr
             nn.Conv2d(4096, n_class, 1),
         )
-        self.upscore = nn.Sequential(
-            # upscore
-            nn.ConvTranspose2d(n_class, n_class, 64, stride=32, bias=False),
-        )
+        if deconv:
+            upscore = nn.ConvTranspose2d(n_class, n_class, 64, stride=32,
+                                         bias=False)
+        else:
+            upscore = nn.UpsamplingBilinear2d(scale_factor=32)
+        self.upscore = nn.Sequential(upscore)
 
     def forward(self, x):
         h = self.features(x)

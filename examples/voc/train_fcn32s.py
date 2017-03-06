@@ -13,12 +13,14 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--out')
     parser.add_argument('--resume')
+    parser.add_argument('--no-deconv', action='store_true')
     args = parser.parse_args()
 
     cuda = torch.cuda.is_available()
 
     out = args.out
     resume = args.resume
+    deconv = not args.no_deconv
 
     seed = 1
     max_iter = 100000
@@ -41,7 +43,7 @@ def main():
 
     # 2. model
 
-    model = torchfcn.models.FCN32s(n_class=21)
+    model = torchfcn.models.FCN32s(n_class=21, deconv=deconv)
     start_epoch = 0
     if resume:
         checkpoint = torch.load(resume)
@@ -51,7 +53,8 @@ def main():
         pth_file = osp.expanduser('~/data/models/torch/vgg16-00b39a1b.pth')
         vgg16 = torchvision.models.vgg16()
         vgg16.load_state_dict(torch.load(pth_file))
-        torchfcn.utils.copy_params_vgg16_to_fcn32s(vgg16, model)
+        torchfcn.utils.copy_params_vgg16_to_fcn32s(vgg16, model,
+                                                   init_upscore=False)
     if cuda:
         model = model.cuda()
 

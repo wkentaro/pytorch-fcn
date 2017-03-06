@@ -5,9 +5,10 @@ class FCN32s(nn.Module):
 
     def __init__(self, n_class=21, deconv=True):
         super(FCN32s, self).__init__()
+        self.use_deconv = deconv
         self.features = nn.Sequential(
             # conv1
-            nn.Conv2d(3, 64, 3, padding=100),
+            nn.Conv2d(3, 64, 3, padding=100 if deconv else 1),
             nn.ReLU(inplace=True),
             nn.Conv2d(64, 64, 3, padding=1),
             nn.ReLU(inplace=True),
@@ -61,7 +62,7 @@ class FCN32s(nn.Module):
             # score_fr
             nn.Conv2d(4096, n_class, 1),
         )
-        if deconv:
+        if self.use_deconv:
             upscore = nn.ConvTranspose2d(n_class, n_class, 64, stride=32,
                                          bias=False)
         else:
@@ -73,7 +74,11 @@ class FCN32s(nn.Module):
 
         h = self.classifier(h)
 
-        h = self.upscore(h)
-        h = h[:, :, 19:19+x.size()[2], 19:19+x.size()[3]].contiguous()
+        if self.use_deconv:
+            h = self.upscore(h)
+            h = h[:, :, 19:19+x.size()[2], 19:19+x.size()[3]].contiguous()
+        else:
+            self.upscore[0].size = x.size()[2], x.size()[3]
+            h = self.upscore(h)
 
         return h

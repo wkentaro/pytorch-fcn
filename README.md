@@ -6,7 +6,6 @@ Fully Convolutional Networks implemented with PyTorch.
 
 ## TODO
 
-- Reproduce result in original paper ([wkentaro/fcn#79](https://github.com/wkentaro/fcn/issues/79))
 - Support FCN16s and FCN8s.
 
 
@@ -21,9 +20,9 @@ Fully Convolutional Networks implemented with PyTorch.
 
 |   epoch |   iteration |   valid/loss |   valid/acc |   valid/acc_cls |   valid/mean_iu |   valid/fwavacc |
 |--------:|------------:|-------------:|------------:|----------------:|----------------:|----------------:|
-|      12 |      101976 |  62577.52163 |    0.897807 |        0.788655 |        0.606812 |        0.848671 |
+|       9 |       76482 | 59656.847812 |    0.897753 |        0.780288 |        0.628707 |        0.844420 |
 
-<img src="_static/fcn32s_voc2012_best_epoch12.jpg" width="40%" />
+<img src="_static/fcn32s_voc2012_best_epoch9.jpg" width="40%" />
 <img src="_static/fcn32s_voc2012_visualization_val.gif" width="40%" />
 
 

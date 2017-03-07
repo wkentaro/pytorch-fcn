@@ -8,7 +8,7 @@ class FCN32s(nn.Module):
         self.use_deconv = deconv
         self.features = nn.Sequential(
             # conv1
-            nn.Conv2d(3, 64, 3, padding=100 if deconv else 1),
+            nn.Conv2d(3, 64, 3, padding=100),
             nn.ReLU(inplace=True),
             nn.Conv2d(64, 64, 3, padding=1),
             nn.ReLU(inplace=True),
@@ -67,6 +67,7 @@ class FCN32s(nn.Module):
                                          bias=False)
         else:
             upscore = nn.UpsamplingBilinear2d(scale_factor=32)
+            upscore.scale_factor = None  # XXX: shoud be set in forward
         self.upscore = nn.Sequential(upscore)
 
     def forward(self, x):
@@ -78,7 +79,8 @@ class FCN32s(nn.Module):
             h = self.upscore(h)
             h = h[:, :, 19:19+x.size()[2], 19:19+x.size()[3]].contiguous()
         else:
-            self.upscore[0].size = x.size()[2], x.size()[3]
+            n_batch, channels, im_h, im_w = x.size()
+            self.upscore[0].size = im_h, im_w
             h = self.upscore(h)
 
         return h

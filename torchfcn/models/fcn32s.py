@@ -77,10 +77,13 @@ class FCN32s(nn.Module):
 
         if self.use_deconv:
             h = self.upscore(h)
-            h = h[:, :, 19:19+x.size()[2], 19:19+x.size()[3]].contiguous()
         else:
-            n_batch, channels, im_h, im_w = x.size()
-            self.upscore[0].size = im_h, im_w
+            from chainer.utils import conv
+            in_h, in_w = h.size()[2:4]
+            out_h = conv.get_deconv_outsize(in_h, k=64, s=32, p=0)
+            out_w = conv.get_deconv_outsize(in_w, k=64, s=32, p=0)
+            self.upscore[0].size = out_h, out_w
             h = self.upscore(h)
+        h = h[:, :, 19:19+x.size()[2], 19:19+x.size()[3]].contiguous()
 
         return h

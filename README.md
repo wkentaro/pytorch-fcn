@@ -13,6 +13,7 @@ Fully Convolutional Networks implemented with PyTorch.
 
 **FCN32s**
 
+- `deconv=False`
 - `train=SBDClassSeg(split='train')`
 - `val=VOC2011(split='seg11val')`
 - `batch_size=1`

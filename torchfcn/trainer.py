@@ -26,7 +26,7 @@ def cross_entropy2d(input, target, weight=None, size_average=True):
     target = target[mask]
     loss = F.nll_loss(log_p, target, weight=weight, size_average=False)
     if size_average:
-        loss /= mask.sum().data[0]
+        loss /= mask.data.sum()
     return loss
 
 

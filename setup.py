@@ -12,7 +12,6 @@ setup(
     version=__version__,
     packages=find_packages(),
     description='PyTorch Implementation of Fully Convolutional Networks.',
-    long_description=open('README.md').read(),
     package_data={'torchfcn': ['torchfcn/ext/*']},
     include_package_data=True,
     author='Kentaro Wada',

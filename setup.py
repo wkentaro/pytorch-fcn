@@ -12,7 +12,7 @@ setup(
     version=__version__,
     packages=find_packages(),
     description='PyTorch Implementation of Fully Convolutional Networks.',
-    package_data={'torchfcn': ['torchfcn/ext/*']},
+    package_data={'torchfcn': ['ext/*']},
     include_package_data=True,
     author='Kentaro Wada',
     author_email='www.kentaro.wada@gmail.com',

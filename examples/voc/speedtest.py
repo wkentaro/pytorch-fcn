@@ -3,56 +3,72 @@
 import argparse
 import time
 
-import chainer
-import fcn
 import numpy as np
 
-import torch
-import torchfcn.models
+
+def bench_chainer(gpu, times):
+    import chainer
+    import fcn
+    print('==> Testing FCN32s with Chainer')
+
+    x_data = np.random.random((1, 3, 480, 640)).astype(np.float32)
+    x_data = chainer.cuda.to_gpu(x_data, device=gpu)
+    x = chainer.Variable(x_data, volatile=True)
+
+    model = fcn.models.FCN32s()
+    model.train = False
+    model.to_gpu(device=gpu)
+
+    for i in xrange(5):
+        model(x)
+    chainer.cuda.to_cpu(model.score.data)  # synchronize
+    t_start = time.time()
+    for i in xrange(times):
+        model(x)
+    chainer.cuda.to_cpu(model.score.data)  # synchronize
+    elapsed_time = time.time() - t_start
+
+    print('Elapsed time: %.2f [s / %d evals]' % (elapsed_time, times))
+    print('Hz: %.2f [hz]' % (times / elapsed_time))
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--gpu', type=int, default=0)
-parser.add_argument('--times', type=int, default=1000)
-args = parser.parse_args()
+def bench_pytorch(gpu, times):
+    import torch
+    import torchfcn.models
+    print('==> Testing FCN32s with PyTorch')
 
-gpu = args.gpu
-n_eval = args.times
+    model = torchfcn.models.FCN32s()
+    model = model.cuda(device_id=gpu)
 
-print('==> Running on GPU: %d to evaluate %d times' % (gpu, n_eval))
+    x_data = np.random.random((1, 3, 480, 640))
+    x = torch.autograd.Variable(torch.from_numpy(x_data).float(),
+                                volatile=True)
+    x = x.cuda(device_id=gpu)
 
+    for i in xrange(5):
+        y = model(x)
+    y.data.cpu()  # synchronize
+    t_start = time.time()
+    for i in xrange(times):
+        y = model(x)
+    y.data.cpu()  # synchronize
+    elapsed_time = time.time() - t_start
 
-print('==> Testing FCN32s with Chainer')
-
-x_data = np.random.random((1, 3, 480, 640)).astype(np.float32)
-x_data = chainer.cuda.to_gpu(x_data, device=gpu)
-x = chainer.Variable(x_data, volatile=True)
-
-model = fcn.models.FCN32s()
-model.train = False
-model.to_gpu(device=gpu)
-
-t_start = time.time()
-for i in xrange(n_eval):
-    model(x)
-elapsed_time = time.time() - t_start
-
-print('Elapsed time: %.2f [s / %d evals]' % (elapsed_time, n_eval))
-print('Hz: %.2f [hz]' % (n_eval / elapsed_time))
+    print('Elapsed time: %.2f [s / %d evals]' % (elapsed_time, times))
+    print('Hz: %.2f [hz]' % (times / elapsed_time))
 
 
-print('==> Testing FCN32s with PyTorch')
-model = torchfcn.models.FCN32s()
-model = model.cuda(device_id=gpu)
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--gpu', type=int, default=0)
+    parser.add_argument('--times', type=int, default=1000)
+    args = parser.parse_args()
 
-x_data = np.random.random((1, 3, 480, 640))
-x = torch.autograd.Variable(torch.from_numpy(x_data).float(), volatile=True)
-x = x.cuda(device_id=gpu)
+    print('==> Running on GPU: %d to evaluate %d times' %
+          (args.gpu, args.times))
+    bench_chainer(args.gpu, args.times)
+    bench_pytorch(args.gpu, args.times)
 
-t_start = time.time()
-for i in xrange(n_eval):
-    model(x)
-elapsed_time = time.time() - t_start
 
-print('Elapsed time: %.2f [s / %d evals]' % (elapsed_time, n_eval))
-print('Hz: %.2f [hz]' % (n_eval / elapsed_time))
+if __name__ == '__main__':
+    main()

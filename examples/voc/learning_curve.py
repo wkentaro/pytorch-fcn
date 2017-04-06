@@ -3,7 +3,6 @@
 from __future__ import division
 
 import argparse
-import collections
 import os.path as osp
 
 import matplotlib
@@ -78,8 +77,8 @@ def learning_curve(log_file):
         # loss (log)
         plt.subplot(n_row, n_col, i * n_col + 2)
         plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
-        plt.semilogy(df_split['epoch_detail'], df_split['%s/loss' % split], '-',
-                     markersize=1, color=colors[0], alpha=.5,
+        plt.semilogy(df_split['epoch_detail'], df_split['%s/loss' % split],
+                     '-', markersize=1, color=colors[0], alpha=.5,
                      label='%s loss' % split)
         plt.xlim((0, row_max['epoch']))
         plt.ylim((min(df_train['train/loss'].min(), row_max['valid/loss']),

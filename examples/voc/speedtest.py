@@ -46,11 +46,11 @@ def bench_pytorch(gpu, times):
     x = x.cuda(device_id=gpu)
 
     for i in xrange(5):
-        y = model(x)
+        model(x)
     torch.cuda.synchronize()
     t_start = time.time()
     for i in xrange(times):
-        y = model(x)
+        model(x)
     torch.cuda.synchronize()
     elapsed_time = time.time() - t_start
 

@@ -36,9 +36,9 @@ PyTorch implementation is a little slower than [Chainer one](https://github.com/
 % ./speedtest.py
 ==> Running on GPU: 0 to evaluate 1000 times
 ==> Testing FCN32s with Chainer
-Elapsed time: 49.53 [s / 1000 evals]
-Hz: 20.19 [hz]
+Elapsed time: 52.03 [s / 1000 evals]
+Hz: 19.22 [hz]
 ==> Testing FCN32s with PyTorch
-Elapsed time: 58.33 [s / 1000 evals]
-Hz: 17.14 [hz]
+Elapsed time: 58.78 [s / 1000 evals]
+Hz: 17.01 [hz]
 ```

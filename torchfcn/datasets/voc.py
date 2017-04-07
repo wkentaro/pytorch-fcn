@@ -5,7 +5,6 @@ import os.path as osp
 
 import numpy as np
 import PIL.Image
-import pkg_resources
 import scipy.io
 import torch
 from torch.utils import data
@@ -127,7 +126,7 @@ class VOC2012ClassSeg(VOCClassSegBase):
 class SBDClassSeg(VOCClassSegBase):
 
     # XXX: It must be renamed to benchmark.tar to be extracted.
-    url = 'http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/semantic_contours/benchmark.tgz'
+    url = 'http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/semantic_contours/benchmark.tgz'  # NOQA
 
     def __init__(self, root, split='train', transform=False):
         self.root = root

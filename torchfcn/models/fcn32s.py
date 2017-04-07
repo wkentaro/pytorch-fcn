@@ -1,3 +1,5 @@
+import numpy as np
+import torch
 import torch.nn as nn
 
 
@@ -101,10 +103,10 @@ class FCN32s(nn.Module):
 
         return h
 
-    def copy_params_from_vgg16(vgg16, copy_fc8=True, init_upscore=True):
+    def copy_params_from_vgg16(self, vgg16, copy_fc8=True, init_upscore=True):
         for l1, l2 in zip(vgg16.features, self.features):
-            if (isinstance(l1, torch.nn.Conv2d) and
-                    isinstance(l2, torch.nn.Conv2d)):
+            if (isinstance(l1, nn.Conv2d) and
+                    isinstance(l2, nn.Conv2d)):
                 assert l1.weight.size() == l2.weight.size()
                 assert l1.bias.size() == l2.bias.size()
                 l2.weight.data = l1.weight.data

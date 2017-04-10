@@ -95,7 +95,7 @@ class FCN32s(nn.Module):
             in_h, in_w = h.size()[2:4]
             out_h = conv.get_deconv_outsize(in_h, k=64, s=32, p=0)
             out_w = conv.get_deconv_outsize(in_w, k=64, s=32, p=0)
-            self.upscore[0].size = out_h, out_w
+            self.upscore.size = out_h, out_w
             h = self.upscore(h)
         else:
             h = self.upscore(h)

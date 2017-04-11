@@ -38,6 +38,7 @@ def bench_pytorch(gpu, times):
     import torchfcn.models
     print('==> Testing FCN32s with PyTorch')
     torch.cuda.set_device(gpu)
+    torch.backends.cudnn.benchmark = True
 
     model = torchfcn.models.FCN32s()
     model.eval()

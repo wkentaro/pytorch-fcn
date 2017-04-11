@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
+import sys
+
 from setuptools import find_packages
 from setuptools import setup
 
@@ -7,10 +11,18 @@ from setuptools import setup
 __version__ = '1.3'
 
 
+try:
+    import torch
+except ImportError:
+    print('Please install PyTorch. (See http://pytorch.org)', file=sys.stderr)
+    sys.exit(1)
+
+
 setup(
     name='torchfcn',
     version=__version__,
     packages=find_packages(),
+    install_requires=[r.strip() for r in open('requirements.txt')],
     description='PyTorch Implementation of Fully Convolutional Networks.',
     package_data={'torchfcn': ['ext/*']},
     include_package_data=True,

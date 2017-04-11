@@ -23,8 +23,7 @@ Fully Convolutional Networks implemented with PyTorch.
 |--------:|------------:|-------------:|------------:|----------------:|----------------:|----------------:|
 |       9 |       76482 | 59656.847812 |    0.897753 |        0.780288 |        0.628707 |        0.844420 |
 
-<img src="_static/fcn32s_voc2012_best_epoch9.jpg" width="40%" />
-<img src="_static/fcn32s_voc2012_visualization_val.gif" width="40%" />
+<img src="_static/fcn32s_voc2012_best_epoch9.jpg" width="40%" /> <img src="_static/fcn32s_voc2012_visualization_val.gif" width="40%" />
 
 
 ## Speed

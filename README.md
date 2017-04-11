@@ -32,15 +32,6 @@ PyTorch implementation is faster for static inputs and slower for dynamic ones t
 (In the previous performance, Chainer one was much slower, but it was fixed via [wkentaro/fcn#90](https://github.com/wkentaro/fcn/pull/90).)
 
 ```bash
-% ./speedtest.py --dynamic-input
-==> Benchmark: gpu=0, times=1000, dynamic_input=True
-==> Testing FCN32s with Chainer
-Elapsed time: 48.83 [s / 1000 evals]
-Hz: 20.48 [hz]
-==> Testing FCN32s with PyTorch
-Elapsed time: 57.00 [s / 1000 evals]
-Hz: 17.55 [hz]
-
 % ./speedtest.py
 ==> Benchmark: gpu=1, times=1000, dynamic_input=False
 ==> Testing FCN32s with Chainer
@@ -49,4 +40,13 @@ Hz: 20.42 [hz]
 ==> Testing FCN32s with PyTorch
 Elapsed time: 45.15 [s / 1000 evals]
 Hz: 22.15 [hz]
+
+% ./speedtest.py --dynamic-input
+==> Benchmark: gpu=0, times=1000, dynamic_input=True
+==> Testing FCN32s with Chainer
+Elapsed time: 48.83 [s / 1000 evals]
+Hz: 20.48 [hz]
+==> Testing FCN32s with PyTorch
+Elapsed time: 57.00 [s / 1000 evals]
+Hz: 17.55 [hz]
 ```

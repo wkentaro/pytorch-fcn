@@ -10,14 +10,15 @@ def bench_chainer(gpu, times):
     import chainer
     import fcn
     print('==> Testing FCN32s with Chainer')
+    chainer.cuda.get_device(gpu).use()
 
     x_data = np.random.random((1, 3, 480, 640)).astype(np.float32)
-    x_data = chainer.cuda.to_gpu(x_data, device=gpu)
+    x_data = chainer.cuda.to_gpu(x_data)
     x = chainer.Variable(x_data, volatile=True)
 
     model = fcn.models.FCN32s()
     model.train = False
-    model.to_gpu(device=gpu)
+    model.to_gpu()
 
     for i in xrange(5):
         model(x)
@@ -36,14 +37,15 @@ def bench_pytorch(gpu, times):
     import torch
     import torchfcn.models
     print('==> Testing FCN32s with PyTorch')
+    torch.cuda.set_device(gpu)
 
     model = torchfcn.models.FCN32s()
-    model = model.cuda(device_id=gpu)
+    model = model.cuda()
 
     x_data = np.random.random((1, 3, 480, 640))
     x = torch.autograd.Variable(torch.from_numpy(x_data).float(),
                                 volatile=True)
-    x = x.cuda(device_id=gpu)
+    x = x.cuda()
 
     for i in xrange(5):
         model(x)

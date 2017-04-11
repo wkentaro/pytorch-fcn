@@ -40,6 +40,7 @@ def bench_pytorch(gpu, times):
     torch.cuda.set_device(gpu)
 
     model = torchfcn.models.FCN32s()
+    model.eval()
     model = model.cuda()
 
     x_data = np.random.random((1, 3, 480, 640))

@@ -33,7 +33,8 @@ def cross_entropy2d(input, target, weight=None, size_average=True):
 class Trainer(object):
 
     def __init__(self, cuda, model, optimizer,
-                 train_loader, val_loader, out, max_iter):
+                 train_loader, val_loader, out, max_iter,
+                 size_average=False):
         self.cuda = cuda
 
         self.model = model
@@ -41,6 +42,8 @@ class Trainer(object):
 
         self.train_loader = train_loader
         self.val_loader = val_loader
+
+        self.size_average = size_average
 
         self.out = out
         if not osp.exists(self.out):
@@ -86,7 +89,8 @@ class Trainer(object):
             data, target = Variable(data, volatile=True), Variable(target)
             score = self.model(data)
 
-            loss = cross_entropy2d(score, target, size_average=False)
+            loss = cross_entropy2d(score, target,
+                                   size_average=self.size_average)
             if np.isnan(float(loss.data[0])):
                 raise ValueError('loss is nan while validating')
             val_loss += float(loss.data[0]) / len(data)
@@ -150,7 +154,8 @@ class Trainer(object):
             self.optim.zero_grad()
             score = self.model(data)
 
-            loss = cross_entropy2d(score, target, size_average=False)
+            loss = cross_entropy2d(score, target,
+                                   size_average=self.size_average)
             loss /= len(data)
             if np.isnan(float(loss.data[0])):
                 raise ValueError('loss is nan while training')

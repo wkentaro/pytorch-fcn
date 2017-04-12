@@ -8,7 +8,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-__version__ = '1.3'
+__version__ = '1.4'
 
 
 try:

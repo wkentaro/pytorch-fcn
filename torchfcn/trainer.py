@@ -1,3 +1,4 @@
+import datetime
 import itertools
 import os
 import os.path as osp
@@ -5,6 +6,7 @@ import shutil
 
 import fcn
 import numpy as np
+import pytz
 import scipy.misc
 import torch
 from torch.autograd import Variable
@@ -43,6 +45,8 @@ class Trainer(object):
         self.train_loader = train_loader
         self.val_loader = val_loader
 
+        self.timestamp_start = \
+            datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
         self.size_average = size_average
 
         self.out = out
@@ -62,6 +66,7 @@ class Trainer(object):
             'valid/acc_cls',
             'valid/mean_iu',
             'valid/fwavacc',
+            'elapsed_time',
         ]
         if not osp.exists(osp.join(self.out, 'log.csv')):
             with open(osp.join(self.out, 'log.csv'), 'w') as f:
@@ -118,8 +123,11 @@ class Trainer(object):
         val_loss /= len(self.val_loader)
 
         with open(osp.join(self.out, 'log.csv'), 'a') as f:
+            elapsed_time = \
+                datetime.datetime.now(pytz.timezone('Asia/Tokyo')) - \
+                self.timestamp_start
             log = [self.epoch, self.iteration] + [''] * 5 + \
-                  [val_loss] + metrics.tolist()
+                  [val_loss] + metrics.tolist() + [elapsed_time]
             log = map(str, log)
             f.write(','.join(log) + '\n')
 
@@ -172,8 +180,11 @@ class Trainer(object):
             metrics = np.mean(metrics, axis=0)
 
             with open(osp.join(self.out, 'log.csv'), 'a') as f:
+                elapsed_time = \
+                    datetime.datetime.now(pytz.timezone('Asia/Tokyo')) - \
+                    self.timestamp_start
                 log = [self.epoch, self.iteration] + [loss.data[0]] + \
-                      metrics.tolist() + [''] * 5
+                       metrics.tolist() + [''] * 5 + [elapsed_time]
                 log = map(str, log)
                 f.write(','.join(log) + '\n')
 

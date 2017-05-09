@@ -184,7 +184,7 @@ class Trainer(object):
                     datetime.datetime.now(pytz.timezone('Asia/Tokyo')) - \
                     self.timestamp_start
                 log = [self.epoch, self.iteration] + [loss.data[0]] + \
-                       metrics.tolist() + [''] * 5 + [elapsed_time]
+                    metrics.tolist() + [''] * 5 + [elapsed_time]
                 log = map(str, log)
                 f.write(','.join(log) + '\n')
 

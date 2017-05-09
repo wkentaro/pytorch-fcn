@@ -12,7 +12,7 @@ __version__ = '1.4.1'
 
 
 try:
-    import torch
+    import torch  # NOQA
 except ImportError:
     print('Please install PyTorch. (See http://pytorch.org)', file=sys.stderr)
     sys.exit(1)

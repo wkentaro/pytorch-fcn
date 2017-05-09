@@ -51,8 +51,7 @@ def main():
         pth_file = osp.expanduser('~/data/models/torch/vgg16-00b39a1b.pth')
         vgg16 = torchvision.models.vgg16()
         vgg16.load_state_dict(torch.load(pth_file))
-        torchfcn.utils.copy_params_vgg16_to_fcn32s(
-            vgg16, model, copy_fc8=True, init_upscore=False)
+        model.copy_params_from_vgg16(vgg16, copy_fc8=True, init_upscore=False)
     if cuda:
         if torch.cuda.device_count() == 1:
             model = model.cuda()

@@ -22,6 +22,7 @@ def learning_curve(log_file):
 
     plt.figure(figsize=(20, 6), dpi=500)
 
+    row_min = df.min()
     row_max = df.max()
 
     # initialize DataFrame for train
@@ -69,8 +70,8 @@ def learning_curve(log_file):
                  markersize=1, color=colors[0], alpha=.5,
                  label='%s loss' % split)
         plt.xlim((0, row_max['epoch']))
-        plt.ylim((min(df_train['train/loss'].min(), row_max['valid/loss']),
-                  max(df_train['train/loss'].max(), row_max['valid/loss'])))
+        plt.ylim((min(row_min['train/loss'], row_min['valid/loss']),
+                  max(row_max['train/loss'], row_max['valid/loss'])))
         plt.xlabel('epoch')
         plt.ylabel('%s loss' % split)
 
@@ -81,8 +82,8 @@ def learning_curve(log_file):
                      '-', markersize=1, color=colors[0], alpha=.5,
                      label='%s loss' % split)
         plt.xlim((0, row_max['epoch']))
-        plt.ylim((min(df_train['train/loss'].min(), row_max['valid/loss']),
-                  max(df_train['train/loss'].max(), row_max['valid/loss'])))
+        plt.ylim((min(row_min['train/loss'], row_min['valid/loss']),
+                  max(row_max['train/loss'], row_max['valid/loss'])))
         plt.xlabel('epoch')
         plt.ylabel('%s loss (log)' % split)
 

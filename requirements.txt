@@ -2,5 +2,5 @@ fcn
 numpy
 Pillow
 scipy
-torchvision
+torchvision==0.1.7
 tqdm

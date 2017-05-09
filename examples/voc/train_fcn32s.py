@@ -20,7 +20,7 @@ def main():
 
     out = args.out
     resume = args.resume
-    deconv = not args.no_deconv
+    nodeconv = args.no_deconv
 
     seed = 1
     max_iter = 100000
@@ -43,7 +43,7 @@ def main():
 
     # 2. model
 
-    model = torchfcn.models.FCN32s(n_class=21, deconv=deconv)
+    model = torchfcn.models.FCN32s(n_class=21, nodeconv=nodeconv)
     start_epoch = 0
     if resume:
         checkpoint = torch.load(resume)

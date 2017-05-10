@@ -11,7 +11,7 @@ import torchfcn
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--out')
+    parser.add_argument('--out', required=True)
     parser.add_argument('--resume')
     parser.add_argument('--no-deconv', action='store_true')
     args = parser.parse_args()

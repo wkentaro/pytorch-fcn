@@ -9,6 +9,21 @@ import torchvision
 import torchfcn
 
 
+def vgg16(pretrained=False):
+    model = torchvision.models.vgg16(pretrained=False)
+    if not pretrained:
+        return model
+    model_url = 'https://s3-us-west-2.amazonaws.com/jcjohns-models/vgg16-00b39a1b.pth'  # NOQA
+    state_dict = torch.utils.model_zoo.load_url(model_url)
+    # patch state_dict
+    state_dict['classifier.0.weight'] = state_dict.pop('classifier.1.weight')
+    state_dict['classifier.0.bias'] = state_dict.pop('classifier.1.bias')
+    state_dict['classifier.3.weight'] = state_dict.pop('classifier.4.weight')
+    state_dict['classifier.3.bias'] = state_dict.pop('classifier.4.bias')
+    model.load_state_dict(state_dict)
+    return model
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--out', required=True)
@@ -50,10 +65,8 @@ def main():
         model.load_state_dict(checkpoint['model_state_dict'])
         start_epoch = checkpoint['epoch']
     else:
-        pth_file = osp.expanduser('~/data/models/torch/vgg16-00b39a1b.pth')
-        vgg16 = torchvision.models.vgg16()
-        vgg16.load_state_dict(torch.load(pth_file))
-        model.copy_params_from_vgg16(vgg16, init_upscore=False)
+        model_vgg16 = vgg16(pretrained=True)
+        model.copy_params_from_vgg16(model_vgg16, init_upscore=False)
     if cuda:
         model = model.cuda()
 

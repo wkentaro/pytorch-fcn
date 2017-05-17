@@ -1,32 +1,44 @@
 #!/usr/bin/env python
 
-import argparse
+import os
 import os.path as osp
+import shutil
 
+import click
 import torch
+import yaml
 
 import torchfcn
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--out', required=True)
-    parser.add_argument('--resume')
-    parser.add_argument('--no-deconv', action='store_true')
-    args = parser.parse_args()
+def load_config_file(config_file):
+    # load config
+    cfg = yaml.load(open(config_file))
+    name = osp.splitext(osp.basename(config_file))[0]
+    for k, v in cfg.items():
+        name += '_%s-%s' % (k.upper(), str(v))
+    # create out
+    out = osp.join(here, 'logs', name)
+    if not osp.exists(out):
+        os.makedirs(out)
+    shutil.copy(config_file, osp.join(out, 'config.yaml'))
+    return cfg, out
+
+
+here = osp.dirname(osp.abspath(__file__))
+
+
+@click.command()
+@click.argument('config_file', type=click.Path(exists=True))
+@click.option('--resume', type=click.Path(exists=True))
+def main(config_file, resume):
+    cfg, out = load_config_file(config_file)
 
     cuda = torch.cuda.is_available()
 
-    out = args.out
-    resume = args.resume
-    nodeconv = args.no_deconv
-
-    seed = 1
-    max_iter = 100000
-
-    torch.manual_seed(seed)
+    torch.manual_seed(1)
     if cuda:
-        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed(1)
 
     # 1. dataset
 
@@ -42,7 +54,7 @@ def main():
 
     # 2. model
 
-    model = torchfcn.models.FCN32s(n_class=21, nodeconv=nodeconv)
+    model = torchfcn.models.FCN32s(n_class=21, nodeconv=cfg['nodeconv'])
     start_epoch = 0
     if resume:
         checkpoint = torch.load(resume)
@@ -56,26 +68,11 @@ def main():
 
     # 3. optimizer
 
-    # FIXME: Per-parameter options not work? No loss discreasing.
-    # conv_weights = []
-    # conv_biases = []
-    # for l in model.features:
-    #     for i, param in enumerate(l.parameters()):
-    #         if i == 0:
-    #             conv_weights.append(param)
-    #         elif i == 1:
-    #             conv_biases.append(param)
-    #         else:
-    #             raise ValueError
     optim = torch.optim.SGD(
-        # FIXME: Per-parameter options not work? No loss discreasing.
-        # [
-        #     {'params': conv_weights},
-        #     {'params': conv_biases, 'lr': 2e-10, 'weight_decay': 0},
-        #     {'params': model.upscore.parameters(), 'lr': 0},  # deconv
-        # ],
         model.parameters(),
-        lr=1e-10, momentum=0.99, weight_decay=0.0005)
+        lr=cfg['lr'],
+        momentum=cfg['momentum'],
+        weight_decay=cfg['weight_decay'])
     if resume:
         optim.load_state_dict(checkpoint['optim_state_dict'])
 
@@ -86,7 +83,7 @@ def main():
         train_loader=train_loader,
         val_loader=val_loader,
         out=out,
-        max_iter=max_iter,
+        max_iter=cfg['max_iteration'],
     )
     trainer.epoch = start_epoch
     trainer.iteration = start_epoch * len(train_loader)

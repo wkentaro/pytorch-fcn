@@ -1,14 +1,24 @@
 #!/usr/bin/env python
 
+import datetime
 import os
 import os.path as osp
+import subprocess
+import shlex
 import shutil
 
 import click
+import pytz
 import torch
 import yaml
 
 import torchfcn
+
+
+def git_hash():
+    cmd = 'git log -n 1 --pretty="%h"'
+    hash = subprocess.check_output(shlex.split(cmd)).strip()
+    return hash
 
 
 def load_config_file(config_file):
@@ -17,6 +27,9 @@ def load_config_file(config_file):
     name = osp.splitext(osp.basename(config_file))[0]
     for k, v in cfg.items():
         name += '_%s-%s' % (k.upper(), str(v))
+    now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
+    name += '_TIME-%s' % now.strftime('%Y%m%d-%H%M%S')
+    name += '_VCS-%s' % git_hash()
     # create out
     out = osp.join(here, 'logs', name)
     if not osp.exists(out):

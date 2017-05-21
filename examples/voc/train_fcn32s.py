@@ -38,6 +38,16 @@ def load_config_file(config_file):
     return cfg, out
 
 
+def get_parameters(model, bias=False):
+    import torch.nn as nn
+    for m in model.modules():
+        if isinstance(m, nn.Conv2d):
+            if bias:
+                yield m.bias
+            else:
+                yield m.weight
+
+
 here = osp.dirname(osp.abspath(__file__))
 
 
@@ -82,7 +92,11 @@ def main(config_file, resume):
     # 3. optimizer
 
     optim = torch.optim.SGD(
-        model.parameters(),
+        [
+            {'params': get_parameters(model, bias=False)},
+            {'params': get_parameters(model, bias=True),
+            'lr': cfg['lr'] * 2, 'weight_decay': 0},
+        ],
         lr=cfg['lr'],
         momentum=cfg['momentum'],
         weight_decay=cfg['weight_decay'])

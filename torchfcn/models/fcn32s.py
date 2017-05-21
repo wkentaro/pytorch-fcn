@@ -84,6 +84,14 @@ class FCN32s(nn.Module):
         else:
             self.upscore = nn.ConvTranspose2d(n_class, n_class, 64, stride=32,
                                               bias=False)
+        self._initialize_weights()
+
+    def _initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                m.weight.data.normal_(0, 0.01)
+                if m.bias is not None:
+                    m.bias.data.zero_()
 
     def forward(self, x):
         h = self.features(x)

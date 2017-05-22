@@ -36,7 +36,7 @@ class Trainer(object):
 
     def __init__(self, cuda, model, optimizer,
                  train_loader, val_loader, out, max_iter,
-                 size_average=False):
+                 size_average=False, interval_validate=4000):
         self.cuda = cuda
 
         self.model = model
@@ -48,6 +48,7 @@ class Trainer(object):
         self.timestamp_start = \
             datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
         self.size_average = size_average
+        self.interval_validate = interval_validate
 
         self.out = out
         if not osp.exists(self.out):
@@ -79,7 +80,6 @@ class Trainer(object):
 
     def validate(self):
         self.model.eval()
-        self.iteration = self.epoch * len(self.train_loader)
 
         n_class = len(self.val_loader.dataset.class_names)
 
@@ -88,7 +88,8 @@ class Trainer(object):
         visualizations = []
         for batch_idx, (data, target) in tqdm.tqdm(
                 enumerate(self.val_loader), total=len(self.val_loader),
-                desc='Valid epoch=%d' % self.epoch, ncols=80, leave=False):
+                desc='Valid iteration=%d' % self.iteration, ncols=80,
+                leave=False):
             if self.cuda:
                 data, target = data.cuda(), target.cuda()
             data, target = Variable(data, volatile=True), Variable(target)
@@ -117,7 +118,7 @@ class Trainer(object):
         out = osp.join(self.out, 'visualization_viz')
         if not osp.exists(out):
             os.makedirs(out)
-        out_file = osp.join(out, '%08d.jpg' % self.epoch)
+        out_file = osp.join(out, 'iter%12d.jpg' % self.iteration)
         scipy.misc.imsave(out_file, fcn.utils.get_tile_image(visualizations))
 
         val_loss /= len(self.val_loader)
@@ -137,6 +138,7 @@ class Trainer(object):
             self.best_mean_iu = mean_iu
         torch.save({
             'epoch': self.epoch,
+            'iteration': self.iteration,
             'arch': self.model.__class__.__name__,
             'optim_state_dict': self.optim.state_dict(),
             'model_state_dict': self.model.state_dict(),
@@ -154,7 +156,13 @@ class Trainer(object):
         for batch_idx, (data, target) in tqdm.tqdm(
                 enumerate(self.train_loader), total=len(self.train_loader),
                 desc='Train epoch=%d' % self.epoch, ncols=80, leave=False):
-            self.iteration = batch_idx + self.epoch * len(self.train_loader)
+            iteration = batch_idx + self.epoch * len(self.train_loader)
+            if self.iteration != 0 and (iteration - 1) != self.iteration:
+                continue  # for resuming
+            self.iteration = iteration
+
+            if self.iteration % self.interval_validate == 0:
+                self.validate()
 
             if self.cuda:
                 data, target = data.cuda(), target.cuda()
@@ -194,7 +202,6 @@ class Trainer(object):
     def train(self):
         for epoch in itertools.count(self.epoch):
             self.epoch = epoch
-            self.validate()
+            self.train_epoch()
             if self.iteration >= self.max_iter:
                 break
-            self.train_epoch()

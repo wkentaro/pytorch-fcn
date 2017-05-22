@@ -82,10 +82,12 @@ def main(config_file, resume):
 
     model = torchfcn.models.FCN32s(n_class=21, nodeconv=cfg['nodeconv'])
     start_epoch = 0
+    start_iteration = 0
     if resume:
         checkpoint = torch.load(resume)
         model.load_state_dict(checkpoint['model_state_dict'])
         start_epoch = checkpoint['epoch']
+        start_iteration = checkpoint['iteration']
     else:
         vgg16 = torchfcn.models.VGG16(pretrained=True)
         model.copy_params_from_vgg16(vgg16, copy_fc8=False, init_upscore=False)
@@ -114,9 +116,10 @@ def main(config_file, resume):
         val_loader=val_loader,
         out=out,
         max_iter=cfg['max_iteration'],
+        interval_validate=cfg.get('interval_validate', len(train_loader)),
     )
     trainer.epoch = start_epoch
-    trainer.iteration = start_epoch * len(train_loader)
+    trainer.iteration = start_iteration
     trainer.train()
 
 

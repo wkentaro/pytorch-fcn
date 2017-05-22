@@ -12,18 +12,18 @@ from base import APC2016Base
 
 class APC2016rbo(APC2016Base):
 
-    def __init__(self, root, train=True, transform=False):
-        self.train = train
+    def __init__(self, split='train', transform=False):
+        assert split in ['train', 'valid', 'all']
+        self.split = split
         self._transform = transform
-        self.dataset_dir = osp.join(root, 'APC2016/APC2016rbo')
+        self.dataset_dir = osp.expanduser('~/data/datasets/APC2016/APC2016rbo')
         data_ids = self._get_ids()
-        ids_train, ids_val = train_test_split(
+        ids_train, ids_valid = train_test_split(
             data_ids, test_size=0.25, random_state=1234)
-        self._ids = {'train': ids_train, 'val': ids_val}
+        self._ids = {'train': ids_train, 'valid': ids_valid, 'all': data_ids}
 
     def __len__(self):
-        split = 'train' if self.train else 'val'
-        return len(self._ids[split])
+        return len(self._ids[self.split])
 
     def _get_ids(self):
         ids = []
@@ -54,8 +54,7 @@ class APC2016rbo(APC2016Base):
         return img, lbl
 
     def __getitem__(self, index):
-        split = 'train' if self.train else 'val'
-        data_id = self._ids[split][index]
+        data_id = self._ids[self.split][index]
         img, lbl = self._load_from_id(data_id)
         if self._transform:
             return self.transform(img, lbl)

@@ -58,13 +58,20 @@ def main(config_file, resume):
 
     # 1. dataset
 
-    root = osp.expanduser('~/data/datasets')
+    cfg['dataset'] = cfg.get('dataset', 'v2')
+    if cfg['dataset'] == 'v2':
+        dataset_class = torchfcn.datasets.APC2016V2
+    elif cfg['dataset'] == 'v3':
+        dataset_class = torchfcn.datasets.APC2016V3
+    else:
+        raise ValueError('Unsupported dataset: %s' % cfg['dataset'])
+
     kwargs = {'num_workers': 4, 'pin_memory': True} if cuda else {}
     train_loader = torch.utils.data.DataLoader(
-        torchfcn.datasets.APC2016V2(root, train=True, transform=True),
+        dataset_class(split='train', transform=True),
         batch_size=batch_size, shuffle=True, **kwargs)
-    val_loader = torch.utils.data.DataLoader(
-        torchfcn.datasets.APC2016V2(root, train=False, transform=True),
+    valid_loader = torch.utils.data.DataLoader(
+        dataset_class(split='valid', transform=True),
         batch_size=batch_size, shuffle=False, **kwargs)
 
     # 2. model
@@ -97,7 +104,7 @@ def main(config_file, resume):
         model=model,
         optimizer=optim,
         train_loader=train_loader,
-        val_loader=val_loader,
+        val_loader=valid_loader,
         out=out,
         max_iter=max_iter,
     )

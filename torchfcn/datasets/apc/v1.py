@@ -5,25 +5,25 @@ from rbo import APC2016rbo
 
 class APC2016V1(APC2016Base):
 
-    def __init__(self, root, train=True, transform=False):
+    def __init__(self, split='train', transform=False):
         self.datasets = [
-            APC2016jsk(root, train, transform),
-            APC2016rbo(root, train, transform),
+            APC2016jsk(split, transform),
+            APC2016rbo(split, transform),
         ]
 
     def __len__(self):
         return sum(len(d) for d in self.datasets)
 
     @property
-    def train(self):
-        train = self.datasets[0].train
-        assert all(d.train == train for d in self.datasets)
-        return train
+    def split(self):
+        split = self.datasets[0].split
+        assert all(d.split == split for d in self.datasets)
+        return split
 
-    @train.setter
-    def train(self, value):
+    @split.setter
+    def split(self, value):
         for d in self.datasets:
-            d.train = value
+            d.split = value
 
     def __getitem__(self, index):
         skipped = 0

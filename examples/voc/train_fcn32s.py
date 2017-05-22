@@ -91,6 +91,8 @@ def main(config_file, resume):
 
     # 3. optimizer
 
+    # TODO(wkentaro): support nodeconv=False with training deconv
+    assert cfg['nodeconv'] == True
     optim = torch.optim.SGD(
         [
             {'params': get_parameters(model, bias=False)},

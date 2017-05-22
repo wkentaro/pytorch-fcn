@@ -1,30 +1,60 @@
 #!/usr/bin/env python
 
-import argparse
+import datetime
+import os
 import os.path as osp
+import shlex
+import shutil
+import subprocess
 
+import click
+import pytz
 import torch
+import yaml
 
 import torchfcn
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--out')
-    parser.add_argument('--resume')
-    args = parser.parse_args()
+def git_hash():
+    cmd = 'git log -n 1 --pretty="%h"'
+    hash = subprocess.check_output(shlex.split(cmd)).strip()
+    return hash
 
-    out = args.out
-    resume = args.resume
+
+here = osp.dirname(osp.abspath(__file__))
+
+
+def load_config_file(config_file):
+    # load config
+    cfg = yaml.load(open(config_file))
+    name = osp.splitext(osp.basename(config_file))[0]
+    for k, v in cfg.items():
+        name += '_%s-%s' % (k.upper(), str(v))
+    now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
+    name += '_TIME-%s' % now.strftime('%Y%m%d-%H%M%S')
+    name += '_VCS-%s' % git_hash()
+    # create out
+    out = osp.join(here, 'logs', name)
+    if not osp.exists(out):
+        os.makedirs(out)
+    shutil.copy(config_file, osp.join(out, 'config.yaml'))
+    return cfg, out
+
+
+@click.command()
+@click.argument('config_file', type=click.Path(exists=True))
+@click.option('--resume', type=click.Path(exists=True))
+def main(config_file, resume):
+    cfg, out = load_config_file(config_file)
+
     cuda = torch.cuda.is_available()
 
-    seed = 1
     batch_size = torch.cuda.device_count() * 3
-    max_iter = 150000 // batch_size
+    max_iter = cfg['max_iteration'] // batch_size
 
-    torch.manual_seed(seed)
+    torch.manual_seed(1)
     if cuda:
-        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed(1)
 
     # 1. dataset
 
@@ -40,7 +70,7 @@ def main():
     # 2. model
 
     n_class = len(train_loader.dataset.class_names)
-    model = torchfcn.models.FCN32s(n_class=n_class)
+    model = torchfcn.models.FCN32s(n_class=n_class, nodeconv=cfg['nodeconv'])
     start_epoch = 0
     if resume:
         checkpoint = torch.load(resume)
@@ -48,7 +78,7 @@ def main():
         start_epoch = checkpoint['epoch']
     else:
         vgg16 = torchfcn.models.VGG16(pretrained=True)
-        model.copy_params_from_vgg16(vgg16, init_upscore=False)
+        model.copy_params_from_vgg16(vgg16, copy_fc8=False, init_upscore=False)
     if cuda:
         if torch.cuda.device_count() == 1:
             model = model.cuda()
@@ -57,7 +87,8 @@ def main():
 
     # 3. optimizer
 
-    optim = torch.optim.Adam(model.parameters(), lr=1e-5, weight_decay=0.0005)
+    optim = torch.optim.Adam(model.parameters(), lr=cfg['lr'],
+                             weight_decay=cfg['weight_decay'])
     if resume:
         optim.load_state_dict(checkpoint['optim_state_dict'])
 

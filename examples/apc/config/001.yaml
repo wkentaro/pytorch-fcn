@@ -1,0 +1,4 @@
+max_iteration: 150000
+nodeconv: true
+lr: 1.0e-5
+weight_decay: 0.0005

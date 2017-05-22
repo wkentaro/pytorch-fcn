@@ -15,7 +15,7 @@ class APC2016rbo(APC2016Base):
     def __init__(self, root, train=True, transform=False):
         self.train = train
         self._transform = transform
-        self.dataset_dir = osp.join(root, 'apc2016/APC2016rbo')
+        self.dataset_dir = osp.join(root, 'APC2016/APC2016rbo')
         data_ids = self._get_ids()
         ids_train, ids_val = train_test_split(
             data_ids, test_size=0.25, random_state=1234)

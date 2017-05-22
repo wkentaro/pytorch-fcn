@@ -1,4 +1,4 @@
-max_iteration: 100000
+max_iteration: 150000
 nodeconv: false
 lr: 1.0e-10
 momentum: 0.99

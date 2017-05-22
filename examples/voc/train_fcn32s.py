@@ -46,6 +46,9 @@ def get_parameters(model, bias=False):
                 yield m.bias
             else:
                 yield m.weight
+        elif isinstance(m, nn.ConvTranspose2d):
+            if not bias:
+                yield m.weight
 
 
 here = osp.dirname(osp.abspath(__file__))
@@ -91,8 +94,6 @@ def main(config_file, resume):
 
     # 3. optimizer
 
-    # TODO(wkentaro): support nodeconv=False with training deconv
-    assert cfg['nodeconv'] == True
     optim = torch.optim.SGD(
         [
             {'params': get_parameters(model, bias=False)},

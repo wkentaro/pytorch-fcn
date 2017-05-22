@@ -92,6 +92,10 @@ class FCN32s(nn.Module):
                 m.weight.data.normal_(0, 0.01)
                 if m.bias is not None:
                     m.bias.data.zero_()
+            if isinstance(m, nn.ConvTranspose2d):
+                m.weight.data.normal_(0, 0.01)
+                if m.bias is not None:
+                    m.bias.data.zero_()
 
     def forward(self, x):
         h = self.features(x)

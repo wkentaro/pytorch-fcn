@@ -107,6 +107,7 @@ def main(config_file, resume):
         val_loader=valid_loader,
         out=out,
         max_iter=max_iter,
+        interval_validate=cfg['interval_validate'],
     )
     trainer.epoch = start_epoch
     trainer.iteration = start_epoch * len(train_loader)

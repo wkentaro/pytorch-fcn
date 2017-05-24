@@ -1,5 +1,6 @@
 import datetime
 import itertools
+import math
 import os
 import os.path as osp
 import shutil
@@ -200,7 +201,9 @@ class Trainer(object):
                 break
 
     def train(self):
-        for epoch in itertools.count(self.epoch):
+        max_epoch = int(math.ceil(1. * self.max_iter / len(self.train_loader)))
+        for epoch in tqdm.trange(self.epoch, max_epoch,
+                                 desc='Train', ncols=80):
             self.epoch = epoch
             self.train_epoch()
             if self.iteration >= self.max_iter:

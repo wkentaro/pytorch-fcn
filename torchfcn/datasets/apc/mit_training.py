@@ -2,7 +2,7 @@ import os
 import os.path as osp
 
 import numpy as np
-import scipy
+import skimage.io
 
 from base import APC2016Base
 
@@ -40,9 +40,9 @@ class APC2016mit_training(APC2016Base):
 
     def _load_from_id(self, data_id):
         empty_file, rgb_file, mask_file, cls_id = data_id
-        img = scipy.misc.imread(rgb_file, mode='RGB')
-        img_empty = scipy.misc.imread(empty_file, mode='RGB')
-        mask = scipy.misc.imread(mask_file, mode='L') > 127
+        img = skimage.io.imread(rgb_file)
+        img_empty = skimage.io.imread(empty_file)
+        mask = skimage.io.imread(mask_file, as_grey=True) >= 0.5
         lbl = np.zeros(mask.shape, dtype=np.int32)
         lbl[mask] = cls_id
         img_empty[mask] = img[mask]

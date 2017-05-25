@@ -3,8 +3,12 @@ import os.path as osp
 
 import numpy as np
 import skimage.io
+import yaml
 
 from base import APC2016Base
+
+
+here = osp.dirname(osp.abspath(__file__))
 
 
 class APC2016mit_training(APC2016Base):
@@ -12,7 +16,17 @@ class APC2016mit_training(APC2016Base):
     def __init__(self, transform=False):
         self._transform = transform
         self.dataset_dir = osp.expanduser('~/data/datasets/APC2016/training')
-        self._ids = list(self._get_ids())
+        # drop by blacklist
+        self._ids = []
+        with open(osp.join(here, 'data/mit_training_blacklist.yaml')) as f:
+            blacklist = map(tuple, yaml.load(f))
+        for data_id in self._get_ids():
+            n_skipped = 0
+            if data_id in blacklist:
+                n_skipped += 1
+                continue
+            self._ids.append(data_id)
+        print('INFO: skipped %d data with blacklist' % n_skipped)
 
     def __len__(self):
         return len(self._ids)

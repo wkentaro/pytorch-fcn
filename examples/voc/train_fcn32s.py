@@ -3,9 +3,9 @@
 import datetime
 import os
 import os.path as osp
-import subprocess
 import shlex
 import shutil
+import subprocess
 
 import click
 import pytz
@@ -100,7 +100,7 @@ def main(config_file, resume):
         [
             {'params': get_parameters(model, bias=False)},
             {'params': get_parameters(model, bias=True),
-            'lr': cfg['lr'] * 2, 'weight_decay': 0},
+             'lr': cfg['lr'] * 2, 'weight_decay': 0},
         ],
         lr=cfg['lr'],
         momentum=cfg['momentum'],

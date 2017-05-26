@@ -13,31 +13,31 @@ here = osp.dirname(osp.abspath(__file__))
 
 class APC2016mit_training(APC2016Base):
 
+    dataset_dir = osp.expanduser('~/data/datasets/APC2016/training')
+
     def __init__(self, transform=False):
         self._transform = transform
-        self.dataset_dir = osp.expanduser('~/data/datasets/APC2016/training')
         # drop by blacklist
         self._ids = []
         with open(osp.join(here, 'data/mit_training_blacklist.yaml')) as f:
-            blacklist = map(tuple, yaml.load(f))
-        for data_id in self._get_ids():
-            n_skipped = 0
-            if data_id in blacklist:
-                n_skipped += 1
+            blacklist = yaml.load(f)
+        for index, data_id in enumerate(self._get_ids()):
+            if index in blacklist:
+                print('WARNING: skipping index=%d data' % index)
                 continue
             self._ids.append(data_id)
-        print('INFO: skipped %d data with blacklist' % n_skipped)
 
     def __len__(self):
         return len(self._ids)
 
-    def _get_ids(self):
+    @classmethod
+    def _get_ids(cls):
         for loc in ['shelf', 'tote']:
-            loc_dir = osp.join(self.dataset_dir, loc)
-            for cls_id, cls in enumerate(self.class_names):
+            loc_dir = osp.join(cls.dataset_dir, loc)
+            for cls_id, cls_name in enumerate(cls.class_names):
                 if cls_id == 0:  # background
                     continue
-                cls_dir = osp.join(loc_dir, cls)
+                cls_dir = osp.join(loc_dir, cls_name)
                 scene_dir_empty = osp.join(cls_dir, 'scene-empty')
                 for scene_dir in os.listdir(cls_dir):
                     scene_dir = osp.join(cls_dir, scene_dir)
@@ -52,7 +52,8 @@ class APC2016mit_training(APC2016Base):
                         if osp.exists(rgb_file) and osp.exists(mask_file):
                             yield empty_file, rgb_file, mask_file, cls_id
 
-    def _load_from_id(self, data_id):
+    @staticmethod
+    def _load_from_id(data_id):
         empty_file, rgb_file, mask_file, cls_id = data_id
         img = skimage.io.imread(rgb_file)
         img_empty = skimage.io.imread(empty_file)

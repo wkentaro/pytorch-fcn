@@ -7,7 +7,7 @@ from rbo import APC2016rbo
 
 class APC2016V3(APC2016Base):
 
-    def __init__(self, split, transform):
+    def __init__(self, split, transform=False):
         if split == 'train':
             self.datasets = [
                 APC2016mit_training(transform),

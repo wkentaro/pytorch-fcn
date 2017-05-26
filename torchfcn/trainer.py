@@ -36,7 +36,7 @@ class Trainer(object):
 
     def __init__(self, cuda, model, optimizer,
                  train_loader, val_loader, out, max_iter,
-                 size_average=False, interval_validate=4000):
+                 size_average=False, interval_validate=None):
         self.cuda = cuda
 
         self.model = model
@@ -48,7 +48,11 @@ class Trainer(object):
         self.timestamp_start = \
             datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
         self.size_average = size_average
-        self.interval_validate = interval_validate
+
+        if interval_validate is None:
+            self.interval_validate = len(self.train_loader)
+        else:
+            self.interval_validate = interval_validate
 
         self.out = out
         if not osp.exists(self.out):

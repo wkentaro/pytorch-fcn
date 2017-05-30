@@ -26,7 +26,7 @@ def main(model_file, deconv):
     n_class = len(val_loader.dataset.class_names)
 
     print('==> Loading model file: %s' % model_file)
-    model = torchfcn.models.FCN32s(n_class=21, deconv=deconv)
+    model = torchfcn.models.FCN32s(n_class=21, nodeconv=not deconv)
     if torch.cuda.is_available():
         model = model.cuda()
     model_data = torch.load(model_file)
@@ -36,9 +36,9 @@ def main(model_file, deconv):
         model.load_state_dict(model_data['model_state_dict'])
     model.eval()
 
-    print('==> Evaluating with VOC2011ClassSeg set11valid')
+    print('==> Evaluating with VOC2011ClassSeg seg11valid')
     visualizations = []
-    metrics = []
+    label_trues, label_preds = [], []
     for batch_idx, (data, target) in tqdm.tqdm(enumerate(val_loader),
                                                total=len(val_loader),
                                                ncols=80, leave=False):
@@ -52,14 +52,15 @@ def main(model_file, deconv):
         lbl_true = target.data.cpu()
         for img, lt, lp in zip(imgs, lbl_true, lbl_pred):
             img, lt = val_loader.dataset.untransform(img, lt)
-            acc, acc_cls, mean_iu, fwavacc = \
-                fcn.utils.label_accuracy_score(lt, lp, n_class=n_class)
-            metrics.append((acc, acc_cls, mean_iu, fwavacc))
+            label_trues.append(lt)
+            label_preds.append(lp)
             if len(visualizations) < 9:
                 viz = fcn.utils.visualize_segmentation(
                     lp, lt, img, n_class=n_class)
                 visualizations.append(viz)
-    metrics = np.mean(metrics, axis=0)
+    metrics = torchfcn.utils.label_accuracy_score(
+        label_trues, label_preds, n_class=n_class)
+    metrics = np.array(metrics)
     metrics *= 100
     print('''\
 Accuracy: {0}

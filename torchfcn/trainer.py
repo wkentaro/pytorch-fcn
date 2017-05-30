@@ -122,7 +122,7 @@ class Trainer(object):
         out = osp.join(self.out, 'visualization_viz')
         if not osp.exists(out):
             os.makedirs(out)
-        out_file = osp.join(out, 'iter%12d.jpg' % self.iteration)
+        out_file = osp.join(out, 'iter%012d.jpg' % self.iteration)
         scipy.misc.imsave(out_file, fcn.utils.get_tile_image(visualizations))
 
         val_loss /= len(self.val_loader)

@@ -13,6 +13,8 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 import tqdm
 
+import torchfcn
+
 
 def cross_entropy2d(input, target, weight=None, size_average=True):
     # input: (n, c, h, w), target: (n, h, w)
@@ -88,8 +90,8 @@ class Trainer(object):
         n_class = len(self.val_loader.dataset.class_names)
 
         val_loss = 0
-        metrics = []
         visualizations = []
+        label_trues, label_preds = [], []
         for batch_idx, (data, target) in tqdm.tqdm(
                 enumerate(self.val_loader), total=len(self.val_loader),
                 desc='Valid iteration=%d' % self.iteration, ncols=80,
@@ -110,13 +112,14 @@ class Trainer(object):
             lbl_true = target.data.cpu()
             for img, lt, lp in zip(imgs, lbl_true, lbl_pred):
                 img, lt = self.val_loader.dataset.untransform(img, lt)
-                acc, acc_cls, mean_iu, fwavacc = \
-                    fcn.utils.label_accuracy_score(lt, lp, n_class=n_class)
-                metrics.append((acc, acc_cls, mean_iu, fwavacc))
+                label_trues.append(lt)
+                label_preds.append(lp)
                 if len(visualizations) < 9:
                     viz = fcn.utils.visualize_segmentation(
                         lp, lt, img, n_class=n_class)
                     visualizations.append(viz)
+        metrics = torchfcn.utils.label_accuracy_score(
+            label_trues, label_preds, n_class)
         metrics = np.mean(metrics, axis=0)
 
         out = osp.join(self.out, 'visualization_viz')
@@ -187,7 +190,8 @@ class Trainer(object):
             lbl_true = target.data.cpu().numpy()
             for lt, lp in zip(lbl_true, lbl_pred):
                 acc, acc_cls, mean_iu, fwavacc = \
-                    fcn.utils.label_accuracy_score(lt, lp, n_class=n_class)
+                    torchfcn.utils.label_accuracy_score(
+                        [lt], [lp], n_class=n_class)
                 metrics.append((acc, acc_cls, mean_iu, fwavacc))
             metrics = np.mean(metrics, axis=0)
 

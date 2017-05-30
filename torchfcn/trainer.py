@@ -120,7 +120,6 @@ class Trainer(object):
                     visualizations.append(viz)
         metrics = torchfcn.utils.label_accuracy_score(
             label_trues, label_preds, n_class)
-        metrics = np.mean(metrics, axis=0)
 
         out = osp.join(self.out, 'visualization_viz')
         if not osp.exists(out):
@@ -135,7 +134,7 @@ class Trainer(object):
                 datetime.datetime.now(pytz.timezone('Asia/Tokyo')) - \
                 self.timestamp_start
             log = [self.epoch, self.iteration] + [''] * 5 + \
-                  [val_loss] + metrics.tolist() + [elapsed_time]
+                  [val_loss] + list(metrics) + [elapsed_time]
             log = map(str, log)
             f.write(','.join(log) + '\n')
 

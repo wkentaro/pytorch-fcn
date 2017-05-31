@@ -80,7 +80,7 @@ def main(config_file, resume):
 
     # 2. model
 
-    model = torchfcn.models.FCN32s(n_class=21, nodeconv=cfg['nodeconv'])
+    model = torchfcn.models.FCN32s(n_class=21)
     start_epoch = 0
     start_iteration = 0
     if resume:
@@ -90,8 +90,7 @@ def main(config_file, resume):
         start_iteration = checkpoint['iteration']
     else:
         vgg16 = torchfcn.models.VGG16(pretrained=True)
-        model.copy_params_from_vgg16(vgg16, copy_fc8=False,
-                                     init_upscore=not cfg['nodeconv'])
+        model.copy_params_from_vgg16(vgg16, copy_fc8=False)
     if cuda:
         model = model.cuda()
 

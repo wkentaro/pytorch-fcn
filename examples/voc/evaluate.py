@@ -14,8 +14,7 @@ import tqdm
 
 @click.command()
 @click.argument('model_file', type=click.Path(exists=True))
-@click.option('--deconv/--nodeconv', default=False)
-def main(model_file, deconv):
+def main(model_file):
     root = osp.expanduser('~/data/datasets')
     val_loader = torch.utils.data.DataLoader(
         torchfcn.datasets.VOC2011ClassSeg(
@@ -26,7 +25,7 @@ def main(model_file, deconv):
     n_class = len(val_loader.dataset.class_names)
 
     print('==> Loading model file: %s' % model_file)
-    model = torchfcn.models.FCN32s(n_class=21, nodeconv=not deconv)
+    model = torchfcn.models.FCN32s(n_class=21)
     if torch.cuda.is_available():
         model = model.cuda()
     model_data = torch.load(model_file)

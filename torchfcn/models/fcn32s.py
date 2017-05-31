@@ -4,24 +4,26 @@ import torch.nn as nn
 
 
 # https://github.com/shelhamer/fcn.berkeleyvision.org/blob/master/surgery.py
-def get_upsample_filter(size):
+def get_upsampling_weight(in_channels, out_channels, kernel_size):
     """Make a 2D bilinear kernel suitable for upsampling"""
-    factor = (size + 1) // 2
-    if size % 2 == 1:
+    factor = (kernel_size + 1) // 2
+    if kernel_size % 2 == 1:
         center = factor - 1
     else:
         center = factor - 0.5
-    og = np.ogrid[:size, :size]
-    filter = (1 - abs(og[0] - center) / factor) * \
-             (1 - abs(og[1] - center) / factor)
-    return torch.from_numpy(filter).float()
+    og = np.ogrid[:kernel_size, :kernel_size]
+    filt = (1 - abs(og[0] - center) / factor) * \
+           (1 - abs(og[1] - center) / factor)
+    weight = np.zeros((in_channels, out_channels, kernel_size, kernel_size),
+                      dtype=np.float64)
+    weight[range(in_channels), range(out_channels), :, :] = filt
+    return torch.from_numpy(weight).float()
 
 
 class FCN32s(nn.Module):
 
-    def __init__(self, n_class=21, nodeconv=False):
+    def __init__(self, n_class=21):
         super(FCN32s, self).__init__()
-        self.nodeconv = nodeconv
         self.features = nn.Sequential(
             # conv1
             nn.Conv2d(3, 64, 3, padding=100),
@@ -78,12 +80,8 @@ class FCN32s(nn.Module):
             # score_fr
             nn.Conv2d(4096, n_class, 1),
         )
-        if self.nodeconv:
-            self.upscore = nn.UpsamplingBilinear2d(scale_factor=32)
-            self.upscore.scale_factor = None  # XXX: shoud be set in forward
-        else:
-            self.upscore = nn.ConvTranspose2d(n_class, n_class, 64, stride=32,
-                                              bias=False)
+        self.upscore = nn.ConvTranspose2d(n_class, n_class, 64, stride=32,
+                                          bias=False)
         self._initialize_weights()
 
     def _initialize_weights(self):
@@ -102,20 +100,12 @@ class FCN32s(nn.Module):
 
         h = self.classifier(h)
 
-        if self.nodeconv:
-            from chainer.utils import conv
-            in_h, in_w = h.size()[2:4]
-            out_h = conv.get_deconv_outsize(in_h, k=64, s=32, p=0)
-            out_w = conv.get_deconv_outsize(in_w, k=64, s=32, p=0)
-            self.upscore.size = out_h, out_w
-            h = self.upscore(h)
-        else:
-            h = self.upscore(h)
+        h = self.upscore(h)
         h = h[:, :, 19:19+x.size()[2], 19:19+x.size()[3]].contiguous()
 
         return h
 
-    def copy_params_from_vgg16(self, vgg16, copy_fc8=True, init_upscore=True):
+    def copy_params_from_vgg16(self, vgg16, copy_fc8=False):
         for l1, l2 in zip(vgg16.features, self.features):
             if (isinstance(l1, nn.Conv2d) and
                     isinstance(l2, nn.Conv2d)):
@@ -134,11 +124,8 @@ class FCN32s(nn.Module):
             l2 = self.classifier[6]
             l2.weight.data = l1.weight.data[:n_class, :].view(l2.weight.size())
             l2.bias.data = l1.bias.data[:n_class]
-        if init_upscore:
-            # initialize upscore layer
-            c1, c2, h, w = self.upscore.weight.data.size()
-            assert c1 == c2 == n_class
-            assert h == w
-            weight = get_upsample_filter(h)
-            self.upscore.weight.data = \
-                weight.view(1, 1, h, w).repeat(c1, c2, 1, 1)
+        assert self.upscore.kernel_size[0] == self.upscore.kernel_size[1]
+        self.upscore.weight.data = get_upsampling_weight(
+            self.upscore.in_channels,
+            self.upscore.out_channels,
+            self.upscore.kernel_size[0])

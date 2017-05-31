@@ -1,5 +1,8 @@
-max_iteration: 150000
+# almost same configuration as original work
+# https://github.com/shelhamer/fcn.berkeleyvision.org
+max_iteration: 100000
 nodeconv: false
 lr: 1.0e-10
 momentum: 0.99
 weight_decay: 0.0005
+interval_validate: 4000

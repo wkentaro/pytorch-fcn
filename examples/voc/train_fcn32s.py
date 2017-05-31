@@ -8,6 +8,7 @@ import shutil
 import subprocess
 
 import click
+import numpy as np
 import pytz
 import torch
 import yaml
@@ -62,9 +63,10 @@ def main(config_file, resume):
 
     cuda = torch.cuda.is_available()
 
-    torch.manual_seed(1)
+    np.random.seed(1337)
+    torch.manual_seed(1337)
     if cuda:
-        torch.cuda.manual_seed(1)
+        torch.cuda.manual_seed(1337)
 
     # 1. dataset
 

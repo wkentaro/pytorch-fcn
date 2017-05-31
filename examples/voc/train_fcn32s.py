@@ -90,7 +90,8 @@ def main(config_file, resume):
         start_iteration = checkpoint['iteration']
     else:
         vgg16 = torchfcn.models.VGG16(pretrained=True)
-        model.copy_params_from_vgg16(vgg16, copy_fc8=False, init_upscore=False)
+        model.copy_params_from_vgg16(vgg16, copy_fc8=False,
+                                     init_upscore=not cfg['nodeconv'])
     if cuda:
         model = model.cuda()
 

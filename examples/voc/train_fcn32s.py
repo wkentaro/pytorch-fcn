@@ -47,9 +47,9 @@ def get_parameters(model, bias=False):
                 yield m.bias
             else:
                 yield m.weight
-        elif isinstance(m, nn.ConvTranspose2d):
-            if not bias:
-                yield m.weight
+        # elif isinstance(m, nn.ConvTranspose2d):
+        #     if not bias:
+        #         yield m.weight
 
 
 here = osp.dirname(osp.abspath(__file__))

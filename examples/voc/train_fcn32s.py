@@ -63,7 +63,6 @@ def main(config_file, resume):
 
     cuda = torch.cuda.is_available()
 
-    np.random.seed(1337)
     torch.manual_seed(1337)
     if cuda:
         torch.cuda.manual_seed(1337)

@@ -29,8 +29,8 @@ def load_config_file(config_file):
     for k, v in cfg.items():
         name += '_%s-%s' % (k.upper(), str(v))
     now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
-    name += '_TIME-%s' % now.strftime('%Y%m%d-%H%M%S')
     name += '_VCS-%s' % git_hash()
+    name += '_TIME-%s' % now.strftime('%Y%m%d-%H%M%S')
     # create out
     out = osp.join(here, 'logs', name)
     if not osp.exists(out):

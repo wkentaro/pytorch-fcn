@@ -90,9 +90,8 @@ def main(config_file, resume):
         start_epoch = checkpoint['epoch']
         start_iteration = checkpoint['iteration']
     else:
-        vgg16_fcn32s = torchfcn.models.FCN32s(n_class=21)
-        vgg16_fcn32s.load_state_dict(torch.load(osp.expanduser('~/data/models/torch/vgg16-fcn32s.pth')))
-        model.copy_params_from_vgg16(vgg16_fcn32s, copy_fc8=False)
+        vgg16 = torchfcn.models.VGG16(pretrained=True)
+        model.copy_params_from_vgg16(vgg16, copy_fc8=False)
     if cuda:
         model = model.cuda()
 

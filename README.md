@@ -13,17 +13,15 @@ Fully Convolutional Networks implemented with PyTorch.
 
 **FCN32s**
 
-- `deconv=False`
 - `train=SBDClassSeg(split='train')`
-- `val=VOC2011(split='seg11val')`
+- `valid=VOC2011(split='seg11val')`
 - `batch_size=1`
 - `MomentumSGD(lr=1e-10, momentum=0.99, weight_decay=0.0005)`
 
-|   epoch |   iteration |   valid/loss |   valid/acc |   valid/acc_cls |   valid/mean_iu |   valid/fwavacc |
-|--------:|------------:|-------------:|------------:|----------------:|----------------:|----------------:|
-|       9 |       76482 | 59656.847812 |    0.897753 |        0.780288 |        0.628707 |        0.844420 |
-
-<img src="_static/fcn32s_voc2012_best_epoch9.jpg" width="40%" /> <img src="_static/fcn32s_voc2012_visualization_val.gif" width="40%" />
+| Implementation |   epoch |   iteration | Accuracy | Accuracy Class | Mean IU | FWAV Accuracy |
+|:--------------:|:-------:|:-----------:|:--------:|:--------------:|:-------:|:-------------:|
+| [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn32s) |       - |           - |    90.49 |          76.48 |   63.63 |         83.47 |
+| Ours           |      11 |      100000 |    90.63 |          72.78 |   63.07 |         83.30 |
 
 
 ## Speed

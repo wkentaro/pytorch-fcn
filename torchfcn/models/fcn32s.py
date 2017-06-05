@@ -87,13 +87,14 @@ class FCN32s(nn.Module):
     def _initialize_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                m.weight.data.normal_(0, 0.01)
+                m.weight.data.zero_()
                 if m.bias is not None:
                     m.bias.data.zero_()
             if isinstance(m, nn.ConvTranspose2d):
-                m.weight.data.normal_(0, 0.01)
-                if m.bias is not None:
-                    m.bias.data.zero_()
+                assert m.kernel_size[0] == m.kernel_size[1]
+                initial_weight = get_upsampling_weight(
+                    m.in_channels, m.out_channels, m.kernel_size[0])
+                m.weight.data.copy_(initial_weight)
 
     def forward(self, x):
         h = self.features(x)
@@ -105,7 +106,7 @@ class FCN32s(nn.Module):
 
         return h
 
-    def copy_params_from_vgg16(self, vgg16, copy_fc8=False):
+    def copy_params_from_vgg16(self, vgg16):
         for l1, l2 in zip(vgg16.features, self.features):
             if (isinstance(l1, nn.Conv2d) and
                     isinstance(l2, nn.Conv2d)):
@@ -118,14 +119,3 @@ class FCN32s(nn.Module):
             l2 = self.classifier[i]
             l2.weight.data = l1.weight.data.view(l2.weight.size())
             l2.bias.data = l1.bias.data.view(l2.bias.size())
-        n_class = self.classifier[6].weight.size()[0]
-        if copy_fc8:
-            l1 = vgg16.classifier[6]
-            l2 = self.classifier[6]
-            l2.weight.data = l1.weight.data[:n_class, :].view(l2.weight.size())
-            l2.bias.data = l1.bias.data[:n_class]
-        assert self.upscore.kernel_size[0] == self.upscore.kernel_size[1]
-        self.upscore.weight.data = get_upsampling_weight(
-            self.upscore.in_channels,
-            self.upscore.out_channels,
-            self.upscore.kernel_size[0])

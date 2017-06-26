@@ -13,4 +13,4 @@ VOC Example
 
 .. code-block:: bash
 
-  ./train_fcn32s.py --out logs/fcn32s_sbd
+  ./train_fcn32s.py config/001.yaml

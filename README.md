@@ -28,6 +28,7 @@ Fully Convolutional Networks implemented with PyTorch.
 
 PyTorch implementation is faster for static inputs and slower for dynamic ones than [Chainer one](https://github.com/wkentaro/fcn) at test time.  
 (In the previous performance, Chainer one was much slower, but it was fixed via [wkentaro/fcn#90](https://github.com/wkentaro/fcn/pull/90).)
+Below are tested using a single GPU, Titan X (Pascal).
 
 ```bash
 % ./speedtest.py

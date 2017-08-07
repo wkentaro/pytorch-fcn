@@ -24,20 +24,6 @@ class FCN8s(nn.Module):
     def __init__(self, n_class=21):
         super(FCN8s, self).__init__()
 
-
-
-        # conv3
-
-
-        # conv4
-
-
-        # conv5
-
-
-        # fc6
-
-
         # conv1
         self.conv1 = nn.Sequential(
             nn.Conv2d(3, 64, 3, padding=100),

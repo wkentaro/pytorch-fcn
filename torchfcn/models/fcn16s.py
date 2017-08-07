@@ -84,8 +84,9 @@ class FCN16s(nn.Module):
             nn.Conv2d(4096, n_class, 1),
         )
         self.upscore2 = nn.ConvTranspose2d(n_class, n_class, 4, stride=2,
-                                          bias=False)
-        self.upscore_pool16 = nn.ConvTranspose2d( n_class, n_class, 32, stride=16)
+                                           bias=False)
+        self.upscore_pool16 = nn.ConvTranspose2d(n_class, n_class, 32,
+                                                 stride=16)
         self._initialize_weights()
 
     def _initialize_weights(self):
@@ -109,16 +110,18 @@ class FCN16s(nn.Module):
         c = self.classifier(conv5)
 
         upscore2 = self.upscore2(c)
-        score_pool4c = score_pool4[:,:,5:5+upscore2.size()[2], 5:5+upscore2.size()[3]]
+        score_pool4c = score_pool4[:, :, 5:5+upscore2.size()[2],
+                                         5:5+upscore2.size()[3]]
         fuse_pool4 = upscore2+score_pool4c
-        upscore16 = self.upscore_pool16( fuse_pool4 )
-        upscore16 = upscore16[:, :,27:27+x.size()[2], 27:27+x.size()[3]].contiguous()
+        upscore16 = self.upscore_pool16(fuse_pool4)
+        upscore16 = upscore16[:, :, 27:27+x.size()[2],
+                                    27:27+x.size()[3]].contiguous()
 
         return upscore16
 
     def copy_params_from_vgg16(self, vgg16):
         n_conv1_conv4_elts = 0
-        for i, l2 in enumerate( self.conv1_conv4 ):
+        for i, l2 in enumerate(self.conv1_conv4):
             n_conv1_conv4_elts += 1
             l1 = vgg16.features[i]
             if (isinstance(l1, nn.Conv2d) and
@@ -127,10 +130,10 @@ class FCN16s(nn.Module):
                 assert l1.bias.size() == l2.bias.size()
                 l2.weight.data = l1.weight.data
                 l2.bias.data = l1.bias.data
-        for i, l2 in enumerate( self.conv5 ):
+        for i, l2 in enumerate(self.conv5):
             l1 = vgg16.features[i+n_conv1_conv4_elts]
             if (isinstance(l1, nn.Conv2d) and
-                isinstance(l2, nn.Conv2d)):
+                    isinstance(l2, nn.Conv2d)):
                 assert l1.weight.size() == l2.weight.size()
                 assert l1.bias.size() == l2.bias.size()
                 l2.weight.data = l1.weight.data

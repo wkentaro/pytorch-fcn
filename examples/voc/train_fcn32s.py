@@ -52,7 +52,7 @@ def get_log_dir(config_id, cfg):
 
 def get_parameters(model, bias=False):
     import torch.nn as nn
-    for m in model.children():
+    for m in model.modules():
         if isinstance(m, nn.Conv2d):
             if bias:
                 yield m.bias

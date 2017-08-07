@@ -12,17 +12,20 @@ def bench_chainer(gpu, times, dynamic_input=False):
     print('==> Testing FCN32s with Chainer')
     chainer.cuda.get_device(gpu).use()
 
+    chainer.config.train = False
+    chainer.config.enable_backprop = False
+
     if dynamic_input:
         x_data = np.random.random((1, 3, 480, 640)).astype(np.float32)
         x_data = chainer.cuda.to_gpu(x_data)
-        x1 = chainer.Variable(x_data, volatile=True)
+        x1 = chainer.Variable(x_data)
         x_data = np.random.random((1, 3, 640, 480)).astype(np.float32)
         x_data = chainer.cuda.to_gpu(x_data)
-        x2 = chainer.Variable(x_data, volatile=True)
+        x2 = chainer.Variable(x_data)
     else:
         x_data = np.random.random((1, 3, 480, 640)).astype(np.float32)
         x_data = chainer.cuda.to_gpu(x_data)
-        x1 = chainer.Variable(x_data, volatile=True)
+        x1 = chainer.Variable(x_data)
 
     model = fcn.models.FCN32s()
     model.train = False

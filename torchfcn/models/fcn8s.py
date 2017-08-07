@@ -24,92 +24,95 @@ class FCN8s(nn.Module):
     def __init__(self, n_class=21):
         super(FCN8s, self).__init__()
 
-        # conv1
-        self.conv1_1 = nn.Conv2d(3, 64, 3, padding=100)
-        self.relu1_1 = nn.ReLU(inplace=True),
-        self.conv1_2 = nn.Conv2d(64, 64, 3, padding=1),
-        self.relu1_2 = nn.ReLU(inplace=True),
-        self.pool1 = nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/2
 
-        # conv2
-        self.conv2_1 = nn.Conv2d(64, 128, 3, padding=1),
-        self.relu2_1 = nn.ReLU(inplace=True),
-        self.conv2_2 = nn.Conv2d(128, 128, 3, padding=1),
-        self.relu2_2 = nn.ReLU(inplace=True),
-        self.pool2 = nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/4
 
         # conv3
-        self.conv3_1 = nn.Conv2d(128, 256, 3, padding=1),
-        self.relu3_1 = nn.ReLU(inplace=True),
-        self.conv3_2 = nn.Conv2d(256, 256, 3, padding=1),
-        self.relu3_2 = nn.ReLU(inplace=True),
-        self.conv3_3 = nn.Conv2d(256, 256, 3, padding=1),
-        self.relu3_3 = nn.ReLU(inplace=True),
-        self.pool3 = nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/8
+
 
         # conv4
-        self.conv4_1 = nn.Conv2d(256, 512, 3, padding=1),
-        self.relu4_1 = nn.ReLU(inplace=True),
-        self.conv4_2 = nn.Conv2d(512, 512, 3, padding=1),
-        self.relu4_2 = nn.ReLU(inplace=True),
-        self.conv4_3 = nn.Conv2d(512, 512, 3, padding=1),
-        self.relu4_3 = nn.ReLU(inplace=True),
-        self.pool4 = nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/16
+
 
         # conv5
-        self.conv5_1 = nn.Conv2d(512, 512, 3, padding=1),
-        self.relu5_1 = nn.ReLU(inplace=True),
-        self.conv5_2 = nn.Conv2d(512, 512, 3, padding=1),
-        self.relu5_2 = nn.ReLU(inplace=True),
-        self.conv5_3 = nn.Conv2d(512, 512, 3, padding=1),
-        self.relu5_3 = nn.ReLU(inplace=True),
-        self.pool5 = nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/32
+
 
         # fc6
-        self.conv6 = nn.Conv2d(512, 4096, 7),
-        self.relu6 = nn.ReLu(inplace=True),
-        self.dropout6 = nn.Dropout2d(),
 
-        # fc7
-        self.conv7 = nn.Conv2d(4096, 4096, 1),
-        self.relu7 = nn.ReLu(inplace=True),
-        self.dropout7 = nn.Dropout2d(),
 
-        # score_fr
-        self.conv_score_fr = nn.Conv2d(4096, n_class, 1),
-
+        # conv1
         self.conv1 = nn.Sequential(
-            self.conv1_1, self.relu1_1, self.conv1_2, self.relu1_2, self.pool1,
+            nn.Conv2d(3, 64, 3, padding=100),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 64, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/2
         )
+
+        # conv2
         self.conv2 = nn.Sequential(
-            self.conv2_1, self.relu2_1, self.conv2_2, self.relu2_2, self.pool2,
+            nn.Conv2d(64, 128, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(128, 128, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/4
         )
+
+        # conv3
         self.conv3 = nn.Sequential(
-            self.conv3_1, self.relu3_1, self.conv3_2, self.relu3_2, self.pool3,
+            nn.Conv2d(128, 256, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/8
         )
+
+        # conv4
         self.conv4 = nn.Sequential(
-            self.conv4_1, self.relu4_2, self.conv4_2, self.relu4_2,
-            self.conv4_3, self.relu4_3, self.pool4,
+            nn.Conv2d(256, 512, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(512, 512, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(512, 512, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/16
         )
+
+        # conv5
         self.conv5 = nn.Sequential(
-            self.conv5_1, self.relu5_1, self.conv5_2, self.relu5_2,
-            self.conv5_3, self.relu5_3, self.pool5
+            nn.Conv2d(512, 512, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(512, 512, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(512, 512, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, stride=2, ceil_mode=True),  # 1/32
         )
+
         self.features = nn.Sequential(
             self.conv1, self.conv2, self.conv3, self.conv4, self.conv5
         )
 
-        self.classfier = (
-            self.conv6, self.relu6, self.dropout6,
-            self.conv7, self.relu7, self.dropout7,
-            self.conv_score_fr
+        self.classifier = nn.Sequential(
+            # fc6
+            nn.Conv2d(512, 4096, 7),
+            nn.ReLU(inplace=True),
+            nn.Dropout2d(),
+
+            # fc7
+            nn.Conv2d(4096, 4096, 1),
+            nn.ReLU(inplace=True),
+            nn.Dropout2d(),
+
+            # score_fr
+            nn.Conv2d(4096, n_class, 1),
         )
 
-        self.upscore2 = nn.ConvTransposed2d(n_class, n_class, 4, stride=2,
+        self.upscore2 = nn.ConvTranspose2d(n_class, n_class, 4, stride=2,
                                             bias=False)
-        self.upscore4 = nn.ConvTransposed2d(n_class, n_class, 4, stride=2,
+        self.upscore4 = nn.ConvTranspose2d(n_class, n_class, 4, stride=2,
                                             bias=False)
-        self.upscore8 = nn.ConvTransposed2d(n_class, n_class, 16, stride=8,
+        self.upscore8 = nn.ConvTranspose2d(n_class, n_class, 16, stride=8,
                                             bias=False)
         self.score_pool3 = nn.Conv2d(256, n_class, 1)
         self.score_pool4 = nn.Conv2d(512, n_class, 1)
@@ -118,7 +121,7 @@ class FCN8s(nn.Module):
         conv3 = self.conv3(self.conv2(self.conv1(x)))
         conv4 = self.conv4(conv3)
         conv5 = self.conv5(conv4)
-        score_fr = self.classfier(conv5)
+        score_fr = self.classifier(conv5)
 
         score_pool3 = self.score_pool3(conv3)
         score_pool4 = self.score_pool4(conv4)

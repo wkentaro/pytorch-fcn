@@ -31,6 +31,6 @@ for name, p1 in caffe_model.params.iteritems():
         p2.data = torch.from_numpy(p1[1].data)
 
 torch_model_path = osp.expanduser(
-    '~/data/models/torch/fcn32s-heavy-pascal.pth')
+    '~/data/models/pytorch/fcn32s-heavy-pascal.pth')
 print('==> Saving FCN32s PyTorch model to: %s' % torch_model_path)
 torch.save(torch_model.state_dict(), torch_model_path)

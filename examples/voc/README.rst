@@ -13,4 +13,4 @@ VOC Example
 
 .. code-block:: bash
 
-  ./train_fcn32s.py config/001.yaml
+  CUDA_VISIBLE_DEVICES=0 ./train_fcn32s.py

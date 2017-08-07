@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import datetime
 import os
 import os.path as osp
@@ -7,13 +8,24 @@ import shlex
 import shutil
 import subprocess
 
-import click
 import numpy as np
 import pytz
 import torch
 import yaml
 
 import torchfcn
+
+configurations = {
+    # same configuration as original work
+    # https://github.com/shelhamer/fcn.berkeleyvision.org
+    1: dict(
+        max_iteration=100000,
+        lr=1.0e-10,
+        momentum=0.99,
+        weight_decay=0.0005,
+        interval_validate=4000,
+    )
+}
 
 
 def git_hash():
@@ -22,21 +34,21 @@ def git_hash():
     return hash
 
 
-def load_config_file(config_file):
+def get_log_dir(config_id, cfg):
     # load config
-    cfg = yaml.load(open(config_file))
-    name = osp.splitext(osp.basename(config_file))[0]
+    name = 'CFG-%03d' % config_id
     for k, v in cfg.items():
         name += '_%s-%s' % (k.upper(), str(v))
     now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
     name += '_VCS-%s' % git_hash()
     name += '_TIME-%s' % now.strftime('%Y%m%d-%H%M%S')
     # create out
-    out = osp.join(here, 'logs', name)
-    if not osp.exists(out):
-        os.makedirs(out)
-    shutil.copy(config_file, osp.join(out, 'config.yaml'))
-    return cfg, out
+    log_dir = osp.join(here, 'logs', name)
+    if not osp.exists(log_dir):
+        os.makedirs(log_dir)
+    with open(osp.join(log_dir, 'config.yaml'), 'w') as f:
+        yaml.safe_dump(cfg, f, default_flow_style=False)
+    return log_dir
 
 
 def get_parameters(model, bias=False):
@@ -55,11 +67,16 @@ def get_parameters(model, bias=False):
 here = osp.dirname(osp.abspath(__file__))
 
 
-@click.command()
-@click.argument('config_file', type=click.Path(exists=True))
-@click.option('--resume', type=click.Path(exists=True))
-def main(config_file, resume):
-    cfg, out = load_config_file(config_file)
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--config', type=int, default=1,
+                        choices=configurations.keys())
+    parser.add_argument('--resume', help='Checkpoint path')
+    args = parser.parse_args()
+
+    cfg = configurations[args.config]
+    out = get_log_dir(args.config, cfg)
+    resume = args.resume
 
     cuda = torch.cuda.is_available()
 

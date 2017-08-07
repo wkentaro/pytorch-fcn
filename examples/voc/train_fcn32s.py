@@ -53,15 +53,20 @@ def get_log_dir(config_id, cfg):
 
 def get_parameters(model, bias=False):
     import torch.nn as nn
-    for m in model.modules():
+    for m in model.children():
         if isinstance(m, nn.Conv2d):
             if bias:
                 yield m.bias
             else:
                 yield m.weight
-        # elif isinstance(m, nn.ConvTranspose2d):
-        #     if not bias:
-        #         yield m.weight
+        elif isinstance(m, nn.ConvTranspose2d):
+            # weight is frozen because it is just a bilinear upsampling
+            if bias:
+                assert m.bias is None
+        elif isinstance(m, nn.Sequential):
+            pass
+        else:
+            raise ValueError('Unexpected module: %s' % str(m))
 
 
 here = osp.dirname(osp.abspath(__file__))

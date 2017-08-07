@@ -111,11 +111,11 @@ class FCN16s(nn.Module):
 
         upscore2 = self.upscore2(c)
         score_pool4c = score_pool4[:, :, 5:5+upscore2.size()[2],
-                                         5:5+upscore2.size()[3]]
+                                   5:5+upscore2.size()[3]]
         fuse_pool4 = upscore2+score_pool4c
         upscore16 = self.upscore_pool16(fuse_pool4)
         upscore16 = upscore16[:, :, 27:27+x.size()[2],
-                                    27:27+x.size()[3]].contiguous()
+                              27:27+x.size()[3]].contiguous()
 
         return upscore16
 

@@ -52,7 +52,14 @@ def get_log_dir(config_id, cfg):
 
 def get_parameters(model, bias=False):
     import torch.nn as nn
-    for m in model.children():
+    modules_skipped = (
+        nn.ReLU,
+        nn.MaxPool2d,
+        nn.Dropout2d,
+        nn.Sequential,
+        torchfcn.models.FCN32s,
+    )
+    for m in model.modules():
         if isinstance(m, nn.Conv2d):
             if bias:
                 yield m.bias
@@ -62,8 +69,8 @@ def get_parameters(model, bias=False):
             # weight is frozen because it is just a bilinear upsampling
             if bias:
                 assert m.bias is None
-        elif isinstance(m, nn.Sequential):
-            pass
+        elif isinstance(m, modules_skipped):
+            continue
         else:
             raise ValueError('Unexpected module: %s' % str(m))
 
@@ -73,15 +80,18 @@ here = osp.dirname(osp.abspath(__file__))
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-g', '--gpu', type=int, required=True)
     parser.add_argument('-c', '--config', type=int, default=1,
                         choices=configurations.keys())
     parser.add_argument('--resume', help='Checkpoint path')
     args = parser.parse_args()
 
+    gpu = args.gpu
     cfg = configurations[args.config]
     out = get_log_dir(args.config, cfg)
     resume = args.resume
 
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu)
     cuda = torch.cuda.is_available()
 
     torch.manual_seed(1337)

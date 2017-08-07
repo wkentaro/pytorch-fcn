@@ -116,7 +116,7 @@ class Trainer(object):
                 label_preds.append(lp)
                 if len(visualizations) < 9:
                     viz = fcn.utils.visualize_segmentation(
-                        lp, lt, img, n_class=n_class)
+                        lbl_pred=lp, lbl_true=lt, img=img, n_class=n_class)
                     visualizations.append(viz)
         metrics = torchfcn.utils.label_accuracy_score(
             label_trues, label_preds, n_class)

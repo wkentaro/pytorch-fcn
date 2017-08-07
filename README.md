@@ -21,7 +21,7 @@ git clone https://github.com/wkentaro/pytorch-fcn.git
 cd pytorch-fcn
 
 conda install pytorch cuda80 torchvision -c soumith
-pip install -e .
+pip install .
 ```
 
 

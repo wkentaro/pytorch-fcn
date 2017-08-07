@@ -5,15 +5,14 @@ import datetime
 import os
 import os.path as osp
 import shlex
-import shutil
 import subprocess
 
-import numpy as np
 import pytz
 import torch
 import yaml
 
 import torchfcn
+
 
 configurations = {
     # same configuration as original work

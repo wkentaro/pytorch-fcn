@@ -29,7 +29,7 @@ setup(
     author='Kentaro Wada',
     author_email='www.kentaro.wada@gmail.com',
     license='MIT',
-    url='https://github.com/wkentaro/torchfcn',
+    url='https://github.com/wkentaro/pytorch-fcn',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',

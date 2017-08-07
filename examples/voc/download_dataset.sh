@@ -10,13 +10,6 @@ if [ ! -e benchmark_RELEASE ]; then
   tar -xvf benchmark.tar
 fi
 
-if [ ! -e VOCdevkit/VOC2011 ]; then
-  wget http://host.robots.ox.ac.uk/pascal/VOC/voc2011/VOCtrainval_25-May-2011.tar
-  tar -xvf VOCtrainval_25-May-2011.tar
-  mv TrainVal/VOCdevkit/VOC2011 VOCdevkit/VOC2011
-  rm -rf TrainVal
-fi
-
 if [ ! -e VOCdevkit/VOC2012 ]; then
   wget http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar
   tar -xvf VOCtrainval_11-May-2012.tar

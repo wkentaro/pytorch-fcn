@@ -80,15 +80,18 @@ here = osp.dirname(osp.abspath(__file__))
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-g', '--gpu', type=int, required=True)
     parser.add_argument('-c', '--config', type=int, default=1,
                         choices=configurations.keys())
     parser.add_argument('--resume', help='Checkpoint path')
     args = parser.parse_args()
 
+    gpu = args.gpu
     cfg = configurations[args.config]
     out = get_log_dir(args.config, cfg)
     resume = args.resume
 
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu)
     cuda = torch.cuda.is_available()
 
     torch.manual_seed(1337)

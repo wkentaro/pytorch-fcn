@@ -1,6 +1,0 @@
-max_iteration: 1500000
-nodeconv: true
-lr: 1.0e-5
-weight_decay: 0.0005
-dataset: v3
-interval_validate: 10000

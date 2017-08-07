@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
+import argparse
 import os.path as osp
 
-import click
 import fcn
 import numpy as np
 import skimage.io
@@ -12,9 +12,13 @@ import torchfcn
 import tqdm
 
 
-@click.command()
-@click.argument('model_file', type=click.Path(exists=True))
-def main(model_file):
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('model_file', help='Model path')
+    args = parser.parse_args()
+
+    model_file = args.model_file
+
     root = osp.expanduser('~/data/datasets')
     val_loader = torch.utils.data.DataLoader(
         torchfcn.datasets.VOC2011ClassSeg(

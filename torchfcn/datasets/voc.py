@@ -37,12 +37,13 @@ class VOCClassSegBase(data.Dataset):
     ])
     mean_bgr = np.array([104.00698793, 116.66876762, 122.67891434])
 
-    def __init__(self, root, year, split='train', transform=False):
+    def __init__(self, root, split='train', transform=False):
         self.root = root
         self.split = split
         self._transform = transform
 
-        dataset_dir = osp.join(self.root, 'VOC/VOCdevkit/VOC%d' % year)
+        # VOC2011 and others are subset of VOC2012
+        dataset_dir = osp.join(self.root, 'VOC/VOCdevkit/VOC2012')
         self.files = collections.defaultdict(list)
         for split in ['train', 'val']:
             imgsets_file = osp.join(
@@ -97,16 +98,14 @@ class VOCClassSegBase(data.Dataset):
 
 class VOC2011ClassSeg(VOCClassSegBase):
 
-    url = 'http://host.robots.ox.ac.uk/pascal/VOC/voc2011/VOCtrainval_25-May-2011.tar'  # NOQA
-
     def __init__(self, root, split='train', transform=False):
         super(VOC2011ClassSeg, self).__init__(
-            root, year=2011, split=split, transform=transform)
+            root, split=split, transform=transform)
         pkg_root = osp.join(osp.dirname(osp.realpath(__file__)), '..')
         imgsets_file = osp.join(
             pkg_root, 'ext/fcn.berkeleyvision.org',
             'data/pascal/seg11valid.txt')
-        dataset_dir = osp.join(self.root, 'VOC/VOCdevkit/VOC2011')
+        dataset_dir = osp.join(self.root, 'VOC/VOCdevkit/VOC2012')
         for did in open(imgsets_file):
             did = did.strip()
             img_file = osp.join(dataset_dir, 'JPEGImages/%s.jpg' % did)
@@ -120,7 +119,7 @@ class VOC2012ClassSeg(VOCClassSegBase):
 
     def __init__(self, root, split='train', transform=False):
         super(VOC2012ClassSeg, self).__init__(
-            root, year=2012, split=split, transform=transform)
+            root, split=split, transform=transform)
 
 
 class SBDClassSeg(VOCClassSegBase):

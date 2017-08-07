@@ -108,7 +108,7 @@ class Trainer(object):
             val_loss += float(loss.data[0]) / len(data)
 
             imgs = data.data.cpu()
-            lbl_pred = score.data.max(1)[1].cpu().numpy()[:, 0, :, :]
+            lbl_pred = score.data.max(1)[1].cpu().numpy()[:, :, :]
             lbl_true = target.data.cpu()
             for img, lt, lp in zip(imgs, lbl_true, lbl_pred):
                 img, lt = self.val_loader.dataset.untransform(img, lt)
@@ -185,7 +185,7 @@ class Trainer(object):
             self.optim.step()
 
             metrics = []
-            lbl_pred = score.data.max(1)[1].cpu().numpy()[:, 0, :, :]
+            lbl_pred = score.data.max(1)[1].cpu().numpy()[:, :, :]
             lbl_true = target.data.cpu().numpy()
             for lt, lp in zip(lbl_true, lbl_pred):
                 acc, acc_cls, mean_iu, fwavacc = \

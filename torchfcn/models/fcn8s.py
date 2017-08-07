@@ -95,11 +95,11 @@ class FCN8s(nn.Module):
         )
 
         self.upscore2 = nn.ConvTranspose2d(n_class, n_class, 4, stride=2,
-                                            bias=False)
+                                           bias=False)
         self.upscore4 = nn.ConvTranspose2d(n_class, n_class, 4, stride=2,
-                                            bias=False)
+                                           bias=False)
         self.upscore8 = nn.ConvTranspose2d(n_class, n_class, 16, stride=8,
-                                            bias=False)
+                                           bias=False)
         self.score_pool3 = nn.Conv2d(256, n_class, 1)
         self.score_pool4 = nn.Conv2d(512, n_class, 1)
 

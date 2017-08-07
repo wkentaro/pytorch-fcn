@@ -4,6 +4,27 @@
 Fully Convolutional Networks implemented with PyTorch.
 
 
+## Requirements
+
+- pytorch >= 0.2.0
+- torchvision >= 0.1.8
+- fcn >= 6.0.0
+- Pillow
+- scipy
+- tqdm
+
+
+## Installation
+
+```bash
+git clone https://github.com/wkentaro/pytorch-fcn.git
+cd pytorch-fcn
+
+conda install pytorch cuda80 torchvision -c soumith
+pip install -e .
+```
+
+
 ## TODO
 
 - Support FCN16s and FCN8s.

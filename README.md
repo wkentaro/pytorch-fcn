@@ -6,12 +6,12 @@ Fully Convolutional Networks implemented with PyTorch.
 
 ## Requirements
 
-- pytorch >= 0.2.0
-- torchvision >= 0.1.8
-- fcn >= 6.0.0
-- Pillow
-- scipy
-- tqdm
+- [pytorch](https://github.com/pytorch/pytorch) >= 0.2.0
+- [torchvision](https://github.com/pytorch/vision) >= 0.1.8
+- [fcn](https://github.com/wkentaro/fcn) >= 6.0.0
+- [Pillow](https://github.com/python-pillow/Pillow)
+- [scipy](https://github.com/scipy/scipy)
+- [tqdm](https://github.com/tqdm/tqdm)
 
 
 ## Installation

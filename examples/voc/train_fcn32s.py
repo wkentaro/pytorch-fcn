@@ -52,6 +52,13 @@ def get_log_dir(config_id, cfg):
 
 def get_parameters(model, bias=False):
     import torch.nn as nn
+    modules_skipped = (
+        nn.ReLU,
+        nn.MaxPool2d,
+        nn.Dropout2d,
+        nn.Sequential,
+        torchfcn.models.FCN32s,
+    )
     for m in model.modules():
         if isinstance(m, nn.Conv2d):
             if bias:
@@ -62,8 +69,8 @@ def get_parameters(model, bias=False):
             # weight is frozen because it is just a bilinear upsampling
             if bias:
                 assert m.bias is None
-        elif isinstance(m, nn.Sequential):
-            pass
+        elif isinstance(m, modules_skipped):
+            continue
         else:
             raise ValueError('Unexpected module: %s' % str(m))
 

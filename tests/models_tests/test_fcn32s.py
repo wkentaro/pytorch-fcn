@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 from nose.tools import assert_true
 import numpy as np
-import torch
 import skimage.data
+import torch
 
 from torchfcn.models.fcn32s import get_upsampling_weight
 

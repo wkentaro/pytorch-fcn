@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 
+from distutils.version import LooseVersion
 import sys
 
 from setuptools import find_packages
@@ -13,8 +14,11 @@ __version__ = '1.5.0'
 
 try:
     import torch  # NOQA
+    if LooseVersion(torch.__version__) < LooseVersion('0.2.0'):
+        raise ImportError
 except ImportError:
-    print('Please install PyTorch. (See http://pytorch.org)', file=sys.stderr)
+    print('Please install pytorch>=0.2.0. (See http://pytorch.org)',
+          file=sys.stderr)
     sys.exit(1)
 
 

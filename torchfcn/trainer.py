@@ -108,12 +108,6 @@ class Trainer(object):
             val_loss += float(loss.data[0]) / len(data)
 
             imgs = data.data.cpu()
-            # print("yes")
-            # print(score.data.size())
-            # print(len(score.data.max(1)))
-            # print(len(score.data.max(1)[1]))
-            # print(score.data.max(1)[1])
-            # print(type(score.data))
             lbl_pred = score.data.max(1)[1].cpu().numpy()[:, :, :]
             lbl_true = target.data.cpu()
             for img, lt, lp in zip(imgs, lbl_true, lbl_pred):

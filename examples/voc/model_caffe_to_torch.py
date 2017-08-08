@@ -26,11 +26,14 @@ for size_reactive in [32, 16]:
 
     torch_model_params = torch_model.parameters()
     for name, p1 in caffe_model.params.iteritems():
-        p2 = torch_model_params.next()
+        l2 = getattr(torch_model, name)
+        p2 = l2.weight
+        assert p1[0].data.shape == tuple(p2.data.size())
         print('%s: %s -> %s' % (name, p1[0].data.shape, p2.data.size()))
         p2.data = torch.from_numpy(p1[0].data)
         if len(p1) == 2:
-            p2 = torch_model_params.next()
+            p2 = l2.bias
+            assert p1[1].data.shape == tuple(p2.data.size())
             print('%s: %s -> %s' % (name, p1[1].data.shape, p2.data.size()))
             p2.data = torch.from_numpy(p1[1].data)
 

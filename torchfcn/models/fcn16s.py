@@ -1,9 +1,14 @@
+import os.path as osp
+
 import torch.nn as nn
 
 from .fcn32s import get_upsampling_weight
 
 
 class FCN16s(nn.Module):
+
+    pretrained_model = \
+        osp.expanduser('~/data/models/pytorch/fcn16s-heavy-pascal.pth')
 
     def __init__(self, n_class=21):
         super(FCN16s, self).__init__()

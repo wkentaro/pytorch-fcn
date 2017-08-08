@@ -1,7 +1,8 @@
 # pytorch-fcn
 
-
 Fully Convolutional Networks implemented with PyTorch.
+
+[![Build Status](https://travis-ci.org/wkentaro/pytorch-fcn.svg?branch=master)](https://travis-ci.org/wkentaro/pytorch-fcn)
 
 
 ## Requirements

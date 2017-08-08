@@ -149,6 +149,7 @@ class FCN8s(nn.Module):
             except Exception:
                 continue
             assert l1.weight.size() == l2.weight.size()
-            assert l1.bias.size() == l2.bias.size()
             l2.weight.data.copy_(l1.weight.data)
-            l2.bias.data.copy_(l1.bias.data)
+            if l1.bias:
+                assert l1.bias.size() == l2.bias.size()
+                l2.bias.data.copy_(l1.bias.data)

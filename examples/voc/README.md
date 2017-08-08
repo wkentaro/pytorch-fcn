@@ -45,3 +45,21 @@ Hz: 20.97 [hz]
 Elapsed time: 54.49 [s / 1000 evals]
 Hz: 18.35 [hz]
 ```
+
+
+## Caffe to PyTorch model
+
+```
+git clone https://github.com/BVLC/caffe.git
+cd caffe
+cp Makefile.config.example Makefile.config
+vim Makefile.config  # edit as you like
+make -j
+make pycaffe
+export PYTHONAPTH=$(pwd)/python:$PYTHONPATH
+cd ..
+
+cd pytorch-fcn
+cd examples/voc
+./model_caffe_to_pytorch.py
+```

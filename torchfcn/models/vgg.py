@@ -19,6 +19,6 @@ def VGG16(pretrained=False):
 def _get_vgg16_pretrained_model():
     return fcn.data.cached_download(
         url='http://drive.google.com/uc?id=0B9P1L--7Wd2vLTJZMXpIRkVVRFk',
-        path=osp.expanduser('~/data/models/pytorch/vgg16-from-caffe.pth'),
+        path=osp.expanduser('~/data/models/pytorch/vgg16_from_caffe.pth'),
         md5='aa75b158f4181e7f6230029eb96c1b13',
     )

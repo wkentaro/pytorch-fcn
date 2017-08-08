@@ -1,5 +1,6 @@
 import os.path as osp
 
+import fcn
 import torch.nn as nn
 
 from .fcn32s import get_upsampling_weight
@@ -8,7 +9,15 @@ from .fcn32s import get_upsampling_weight
 class FCN8s(nn.Module):
 
     pretrained_model = \
-        osp.expanduser('~/data/models/pytorch/fcn8s-heavy-pascal.pth')
+        osp.expanduser('~/data/models/pytorch/fcn8s_from_caffe.pth')
+
+    @classmethod
+    def download(cls):
+        return fcn.data.cached_download(
+            url='http://drive.google.com/uc?id=0B9P1L--7Wd2vT0FtdThWREhjNkU',
+            path=cls.pretrained_model,
+            md5='dbd9bbb3829a3184913bccc74373afbb',
+        )
 
     def __init__(self, n_class=21):
         super(FCN8s, self).__init__()
@@ -163,7 +172,15 @@ class FCN8s(nn.Module):
 class FCN8sAtOnce(FCN8s):
 
     pretrained_model = \
-        osp.expanduser('~/data/models/pytorch/fcn8s-atonce-heavy-pascal.pth')
+        osp.expanduser('~/data/models/pytorch/fcn8s-atonce_from_caffe.pth')
+
+    @classmethod
+    def download(cls):
+        return fcn.data.cached_download(
+            url='http://drive.google.com/uc?id=0B9P1L--7Wd2vblE1VUIxV1o2d2M',
+            path=cls.pretrained_model,
+            md5='bfed4437e941fef58932891217fe6464',
+        )
 
     def forward(self, x):
         h = x

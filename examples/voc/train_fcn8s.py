@@ -21,7 +21,7 @@ configurations = {
         momentum=0.99,
         weight_decay=0.0005,
         interval_validate=4000,
-        fcn16s_pretrained_model=torchfcn.models.FCN16s.pretrained_model,
+        fcn16s_pretrained_model=torchfcn.models.FCN16s.download(),
     )
 }
 

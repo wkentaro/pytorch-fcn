@@ -1,4 +1,4 @@
-fcn>=6.1.4
+fcn>=6.1.5
 numpy
 Pillow
 scipy

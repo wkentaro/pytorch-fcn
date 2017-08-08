@@ -73,7 +73,8 @@ def main():
             label_preds.append(lp)
             if len(visualizations) < 9:
                 viz = fcn.utils.visualize_segmentation(
-                    lbl_pred=lp, lbl_true=lt, img=img, n_class=n_class)
+                    lbl_pred=lp, lbl_true=lt, img=img, n_class=n_class,
+                    label_names=val_loader.dataset.class_names)
                 visualizations.append(viz)
     metrics = torchfcn.utils.label_accuracy_score(
         label_trues, label_preds, n_class=n_class)

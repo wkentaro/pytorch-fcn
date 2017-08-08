@@ -9,8 +9,7 @@ import caffe  # NOQA: must be after import caffe
 import torchfcn
 
 
-# for size_reactive in [32, 16, 8]:
-for size_reactive in [32, 16]:
+for size_reactive in [32, 16, 8]:
     print('==> Loading caffe model of FCN%ds' % size_reactive)
     pkg_root = pkg_resources.get_distribution('torchfcn').location
     sys.path.insert(

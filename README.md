@@ -32,7 +32,7 @@ See [VOC example](examples/voc).
 
 ## Accuracy
 
-At pytorch-fcn==1.7.0.
+At `pytorch-fcn==1.7.0`.
 
 | Model | Implementation |   epoch |   iteration | Accuracy | Accuracy Class | Mean IU | FWAV Accuracy |
 |:-----:|:--------------:|:-------:|:-----------:|:--------:|:--------------:|:-------:|:-------------:|

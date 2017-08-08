@@ -8,7 +8,7 @@ Fully Convolutional Networks implemented with PyTorch.
 
 - [pytorch](https://github.com/pytorch/pytorch) >= 0.2.0
 - [torchvision](https://github.com/pytorch/vision) >= 0.1.8
-- [fcn](https://github.com/wkentaro/fcn) >= 6.1.4
+- [fcn](https://github.com/wkentaro/fcn) >= 6.1.5
 - [Pillow](https://github.com/python-pillow/Pillow)
 - [scipy](https://github.com/scipy/scipy)
 - [tqdm](https://github.com/tqdm/tqdm)

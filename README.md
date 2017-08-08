@@ -25,7 +25,7 @@ pip install .
 ```
 
 
-## Performance
+## Accuracy
 
 | Model | Implementation |   epoch |   iteration | Accuracy | Accuracy Class | Mean IU | FWAV Accuracy |
 |:-----:|:--------------:|:-------:|:-----------:|:--------:|:--------------:|:-------:|:-------------:|

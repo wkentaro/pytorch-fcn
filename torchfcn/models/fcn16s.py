@@ -131,6 +131,7 @@ class FCN16s(nn.Module):
         for name, l1 in fcn32s.named_children():
             try:
                 l2 = getattr(self, name)
+                l2.weight  # skip ReLU / Dropout
             except Exception:
                 continue
             assert l1.weight.size() == l2.weight.size()

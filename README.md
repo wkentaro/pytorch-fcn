@@ -45,5 +45,5 @@ At pytorch-fcn==1.7.0.
 |FCN8sAtOnce | [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s-atonce) | - | -     | 91.13 | 78.50 | 65.40 | 84.44 |
 |FCN8sAtOnce | Ours                                                                                         | 6 | 56000 | 91.12 | 76.42 | 65.10 | 84.36 |
 
-![](static/fcn8s_iter28000.jpg)
+<img src="static/fcn8s_iter28000.jpg" width="50%" />
 Visualization of validation result of FCN8s.

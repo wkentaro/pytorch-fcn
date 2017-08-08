@@ -25,7 +25,14 @@ pip install .
 ```
 
 
+## Training
+
+See [VOC example](examples/voc).
+
+
 ## Accuracy
+
+At pytorch-fcn==1.7.0.
 
 | Model | Implementation |   epoch |   iteration | Accuracy | Accuracy Class | Mean IU | FWAV Accuracy |
 |:-----:|:--------------:|:-------:|:-----------:|:--------:|:--------------:|:-------:|:-------------:|
@@ -38,29 +45,5 @@ pip install .
 |FCN8sAtOnce | [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s-atonce) | - | -     | 91.13 | 78.50 | 65.40 | 84.44 |
 |FCN8sAtOnce | Ours                                                                                         | 6 | 56000 | 91.12 | 76.42 | 65.10 | 84.36 |
 
-
-## Speed
-
-PyTorch implementation is faster for static inputs and slower for dynamic ones than [Chainer one](https://github.com/wkentaro/fcn) at test time.  
-(In the previous performance, Chainer one was much slower, but it was fixed via [wkentaro/fcn#90](https://github.com/wkentaro/fcn/pull/90).)  
-Below are tested using a single GPU, Titan X (Pascal).
-
-```bash
-% ./speedtest.py
-==> Benchmark: gpu=1, times=1000, dynamic_input=False
-==> Testing FCN32s with Chainer
-Elapsed time: 48.98 [s / 1000 evals]
-Hz: 20.42 [hz]
-==> Testing FCN32s with PyTorch
-Elapsed time: 45.15 [s / 1000 evals]
-Hz: 22.15 [hz]
-
-% ./speedtest.py --dynamic-input
-==> Benchmark: gpu=0, times=1000, dynamic_input=True
-==> Testing FCN32s with Chainer
-Elapsed time: 48.83 [s / 1000 evals]
-Hz: 20.48 [hz]
-==> Testing FCN32s with PyTorch
-Elapsed time: 57.00 [s / 1000 evals]
-Hz: 17.55 [hz]
-```
+![](static/fcn8s_iter28000.jpg)
+Visualization of validation result of FCN8s.

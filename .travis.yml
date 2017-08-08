@@ -24,7 +24,7 @@ before_install:
   - conda info -a
 
 install:
-  - conda create --name=pytorch-fcn python=2.7 anaconda -q -y
+  - conda create --name=pytorch-fcn python=2.7 -q -y
   - conda install pytorch torchvision cuda80 -c soumith -q -y
   - pip install -q -e .
 

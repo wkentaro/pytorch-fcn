@@ -150,6 +150,6 @@ class FCN8s(nn.Module):
                 continue
             assert l1.weight.size() == l2.weight.size()
             l2.weight.data.copy_(l1.weight.data)
-            if l1.bias:
+            if l1.bias is not None:
                 assert l1.bias.size() == l2.bias.size()
                 l2.bias.data.copy_(l1.bias.data)

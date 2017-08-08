@@ -1,4 +1,5 @@
-from . import datasets  # NOQA
-from . import models  # NOQA
-from .trainer import Trainer  # NOQA
-from . import utils  # NOQA
+# flake8: noqa
+from . import datasets
+from . import models
+from . import utils
+from .trainer import Trainer

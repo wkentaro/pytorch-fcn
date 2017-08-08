@@ -5,8 +5,9 @@ import pkg_resources
 import sys
 
 import torch
+
 # FIXME: must be after import torch
-import caffe  # NOQA
+import caffe
 
 import torchfcn
 

@@ -33,6 +33,8 @@ def main():
         model = torchfcn.models.FCN32s(n_class=21)
     elif osp.basename(model_file).startswith('fcn16s'):
         model = torchfcn.models.FCN16s(n_class=21)
+    elif osp.basename(model_file).startswith('fcn8s'):
+        model = torchfcn.models.FCN8s(n_class=21)
     else:
         raise ValueError
     if torch.cuda.is_available():

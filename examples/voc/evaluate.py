@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import os
 import os.path as osp
 
 import fcn
@@ -15,8 +16,10 @@ import tqdm
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('model_file', help='Model path')
+    parser.add_argument('-g', '--gpu', type=int, default=0)
     args = parser.parse_args()
 
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
     model_file = args.model_file
 
     root = osp.expanduser('~/data/datasets')
@@ -28,17 +31,21 @@ def main():
 
     n_class = len(val_loader.dataset.class_names)
 
-    print('==> Loading model file: %s' % model_file)
     if osp.basename(model_file).startswith('fcn32s'):
         model = torchfcn.models.FCN32s(n_class=21)
     elif osp.basename(model_file).startswith('fcn16s'):
         model = torchfcn.models.FCN16s(n_class=21)
     elif osp.basename(model_file).startswith('fcn8s'):
-        model = torchfcn.models.FCN8s(n_class=21)
+        if osp.basename(model_file).startswith('fcn8s-atonce'):
+            model = torchfcn.models.FCN8sAtOnce(n_class=21)
+        else:
+            model = torchfcn.models.FCN8s(n_class=21)
     else:
         raise ValueError
     if torch.cuda.is_available():
         model = model.cuda()
+    print('==> Loading %s model file: %s' %
+          (model.__class__.__name__, model_file))
     model_data = torch.load(model_file)
     try:
         model.load_state_dict(model_data)

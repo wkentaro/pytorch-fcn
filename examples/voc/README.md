@@ -27,14 +27,6 @@ PyTorch implementation is faster for static inputs and slower for dynamic ones t
 
 % cd examples/voc
 
-% ./speedtest.py
-==> Benchmark: gpu=1, times=1000, dynamic_input=False
-==> Testing FCN32s with Chainer
-Elapsed time: 48.98 [s / 1000 evals]
-Hz: 20.42 [hz]
-==> Testing FCN32s with PyTorch
-Elapsed time: 45.15 [s / 1000 evals]
-Hz: 22.15 [hz]
 % ./speedtest.py --gpu 2
 ==> Benchmark: gpu=2, times=1000, dynamic_input=False
 ==> Testing FCN32s with Chainer

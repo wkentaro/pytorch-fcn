@@ -13,7 +13,8 @@ import torchfcn
 for size_reactive in [32, 16]:
     print('==> Loading caffe model of FCN%ds' % size_reactive)
     pkg_root = pkg_resources.get_distribution('torchfcn').location
-    sys.path.insert(0, osp.join(pkg_root, 'torchfcn/ext/fcn.berkeleyvision.org'))
+    sys.path.insert(
+        0, osp.join(pkg_root, 'torchfcn/ext/fcn.berkeleyvision.org'))
     caffe_prototxt = osp.join(
         pkg_root,
         'torchfcn/ext/fcn.berkeleyvision.org/voc-fcn%ds/deploy.prototxt' %

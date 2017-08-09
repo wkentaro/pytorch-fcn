@@ -27,9 +27,8 @@ install:
   - conda create --name=pytorch-fcn python=2.7 -q -y
   - conda install pytorch torchvision cuda80 -c soumith -q -y
   - pip install -q -e .
+  - pip install -q hacking pytest
 
 script:
-  - pip install -q hacking
-  - flake8 .
-  - pip install -q pytest
+  - flake8 .calib_required_joint_controller
   - pytest -vs tests

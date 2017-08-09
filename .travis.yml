@@ -30,5 +30,5 @@ install:
   - pip install -q hacking pytest
 
 script:
-  - flake8 .calib_required_joint_controller
+  - flake8 .
   - pytest -vs tests

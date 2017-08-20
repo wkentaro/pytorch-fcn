@@ -4,10 +4,14 @@ dist: trusty
 
 language: python
 
+matrix:
+  include:
+    - python: 2.7
+    - python: 3.5
+
 cache:
-  directories:
-    - $HOME/.cache/pip
-    - $HOME/.ccache
+  - ccache
+  - pip
 
 before_install:
   # install miniconda
@@ -24,7 +28,7 @@ before_install:
   - conda info -a
 
 install:
-  - conda create --name=pytorch-fcn python=2.7 -q -y
+  - conda create --name=pytorch-fcn python=$TRAVIS_PYTHON_VERSION -q -y
   - conda install pytorch torchvision cuda80 -c soumith -q -y
   - pip install -q -e .
   - pip install -q hacking pytest

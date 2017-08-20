@@ -1,6 +1,6 @@
 # pytorch-fcn
 
-[![](https://badge.fury.io/gh/wkentaro%2Fpytorch-fcn.svg)](https://badge.fury.io/gh/wkentaro%2Fpytorch-fcn)
+[![PyPI Version](https://img.shields.io/pypi/v/pytorch-fcn.svg)](https://pypi.python.org/pypi/pytorch-fcn)
 [![Build Status](https://travis-ci.org/wkentaro/pytorch-fcn.svg?branch=master)](https://travis-ci.org/wkentaro/pytorch-fcn)
 
 Fully Convolutional Networks implemented with PyTorch.

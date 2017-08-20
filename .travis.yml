@@ -30,7 +30,9 @@ before_install:
 install:
   - conda create --name=pytorch-fcn python=$TRAVIS_PYTHON_VERSION -q -y
   - conda install pytorch torchvision cuda80 -c soumith -q -y
-  - pip install -q -e .
+  - pip install -q .
+
+before_script:
   - pip install -q hacking pytest
 
 script:

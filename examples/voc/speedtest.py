@@ -4,6 +4,7 @@ import argparse
 import time
 
 import numpy as np
+import six
 
 
 def bench_chainer(gpu, times, dynamic_input=False):
@@ -31,11 +32,11 @@ def bench_chainer(gpu, times, dynamic_input=False):
     model.train = False
     model.to_gpu()
 
-    for i in xrange(5):
+    for i in six.moves.range(5):
         model(x1)
     chainer.cuda.Stream().synchronize()
     t_start = time.time()
-    for i in xrange(times):
+    for i in six.moves.range(times):
         if dynamic_input:
             if i % 2 == 1:
                 model(x1)
@@ -73,11 +74,11 @@ def bench_pytorch(gpu, times, dynamic_input=False):
         x1 = torch.autograd.Variable(torch.from_numpy(x_data).float(),
                                      volatile=True).cuda()
 
-    for i in xrange(5):
+    for i in six.moves.range(5):
         model(x1)
     torch.cuda.synchronize()
     t_start = time.time()
-    for i in xrange(times):
+    for i in six.moves.range(times):
         if dynamic_input:
             if i % 2 == 1:
                 model(x1)

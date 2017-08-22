@@ -37,3 +37,6 @@ before_script:
 script:
   - flake8 .
   - pytest -vs tests
+
+notifications:
+  email: false

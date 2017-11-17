@@ -1,8 +1,12 @@
+# FIXME: Import order causes error:
+# ImportError: dlopen: cannot load any more object with static TL
+# https://github.com/pytorch/pytorch/issues/2083
+import torch
+
 import matplotlib.pyplot as plt
 from nose.tools import assert_true
 import numpy as np
 import skimage.data
-import torch
 
 from torchfcn.models.fcn32s import get_upsampling_weight
 

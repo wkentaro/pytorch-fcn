@@ -11,6 +11,10 @@
 ./train_fcn16s.py -g 0
 ./train_fcn8s.py -g 0
 ./train_fcn8s_atonce.py -g 0
+
+wget https://raw.githubusercontent.com/wkentaro/dotfiles/1.2.1/local/bin/view_log
+chmod u+x view_log
+./view_log logs/XXX/log.csv
 ```
 
 

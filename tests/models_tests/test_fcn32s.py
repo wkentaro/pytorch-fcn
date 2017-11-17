@@ -4,7 +4,6 @@
 import torch
 
 import matplotlib.pyplot as plt
-from nose.tools import assert_true
 import numpy as np
 import skimage.data
 
@@ -34,8 +33,8 @@ def test_get_upsampling_weight():
     y = y.transpose(1, 2, 0)
     dst = y.astype(np.uint8)
 
-    assert_true(abs(src.shape[0] * 2 - dst.shape[0]) <= 2)
-    assert_true(abs(src.shape[1] * 2 - dst.shape[1]) <= 2)
+    assert abs(src.shape[0] * 2 - dst.shape[0]) <= 2
+    assert abs(src.shape[1] * 2 - dst.shape[1]) <= 2
 
     return src, dst
 

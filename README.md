@@ -34,7 +34,7 @@ See [VOC example](examples/voc).
 
 ## Accuracy
 
-At `pytorch-fcn==1.7.0`.
+At `10fdec9`.
 
 | Model | Implementation |   epoch |   iteration | Mean IU |
 |:-----:|:--------------:|:-------:|:-----------:|:-------:|

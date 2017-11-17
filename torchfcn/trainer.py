@@ -85,6 +85,7 @@ class Trainer(object):
         self.best_mean_iu = 0
 
     def validate(self):
+        training = self.model.training
         self.model.eval()
 
         n_class = len(self.val_loader.dataset.class_names)
@@ -154,6 +155,9 @@ class Trainer(object):
             shutil.copy(osp.join(self.out, 'checkpoint.pth.tar'),
                         osp.join(self.out, 'model_best.pth.tar'))
 
+        if training:
+            self.model.train()
+
     def train_epoch(self):
         self.model.train()
 
@@ -169,6 +173,8 @@ class Trainer(object):
 
             if self.iteration % self.interval_validate == 0:
                 self.validate()
+
+            assert self.model.training
 
             if self.cuda:
                 data, target = data.cuda(), target.cuda()

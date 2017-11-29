@@ -60,7 +60,7 @@ cp Makefile.config.example Makefile.config
 vim Makefile.config  # edit as you like
 make -j
 make pycaffe
-export PYTHONAPTH=$(pwd)/python:$PYTHONPATH
+export PYTHONPATH=$(pwd)/python:$PYTHONPATH
 cd ..
 
 cd pytorch-fcn

@@ -108,6 +108,10 @@ class FCN32s(nn.Module):
                 m.weight.data.copy_(initial_weight)
 
     def forward(self, x):
+        """
+        :param x: 1 x C x H x W Variable (unsure if its H x W or W x H)
+        :return:
+        """
         h = x
         h = self.relu1_1(self.conv1_1(h))
         h = self.relu1_2(self.conv1_2(h))

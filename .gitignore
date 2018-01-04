@@ -3,3 +3,6 @@
 
 build/
 dist/
+
+# PyCharm files
+.idea/

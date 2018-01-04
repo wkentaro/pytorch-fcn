@@ -7,6 +7,7 @@ import shutil
 import fcn
 import numpy as np
 import pytz
+import random
 import scipy.misc
 import torch
 from torch.autograd import Variable
@@ -16,7 +17,60 @@ import tqdm
 import torchfcn
 
 
+class FrobeniusLoss(object):
+    """
+    An unbiased estimator of the Frobenius norm between the true and predicted graph adjacency matrices.
+    """
+    def __init__(self, n_nodes):
+        """
+        :param n_nodes: Number of random nodes to sample from the graph.
+        """
+        self._n_nodes = n_nodes
+
+    def loss(self, input, target):
+        """
+        Compute an unbiased estimate of the Frobenius norm by randomly selecting nodes from the graph adjacency matrices.
+        :param input: N x C x H x W Float Variable. Predicted eigenvectors, i.e. the embedding for every pixel.
+        :param target: N x H x W Long Variable. Instance labels for every channel
+        :return loss:
+        """
+        # Randomly sample nodes
+        n, c, h, w = input.size()
+        total_nodes_per_image = c * h
+        assert total_nodes_per_image >= self._n_nodes
+        random_indices = Variable(target.data.new(random.sample(xrange(total_nodes_per_image), self._n_nodes * n)).view(n, self._n_nodes))  # n x n_nodes
+
+        # Compute loss
+        input_subsample = torch.gather(input.view(n, c, -1), 2, random_indices.unsqueeze(dim=1).expand(-1, c, -1))  # N x C x n_nodes
+        target_subsample = torch.gather(target.view(n, -1), 1, random_indices)  # N x n_nodes
+        input_adjacency = torch.bmm(input_subsample.transpose(1, 2), input_subsample)  # N x n_nodes x n_nodes
+        target_adjacency = labels_to_adjacency(target_subsample.view(n, -1))
+        loss = torch.norm(input_adjacency - target_adjacency, p=2)  # Frobenius norm
+        return loss
+
+        # TODO Other random sample strategies: Choose random edges
+
+
+def labels_to_adjacency(labels):
+    """
+    :param labels: N x M LongTensor Variable, where N is the batch size and M is the number of nodes.
+    :return adjacency: N x M x M FloatTensor Variable.
+    """
+    m = labels.size(1)
+    labels = labels.unsqueeze(dim=1).expand(-1, m, -1)  # N x M x M matrix
+    adjacency = (labels == labels.transpose(1, 2)).float()
+    return adjacency
+
+
 def cross_entropy2d(input, target, weight=None, size_average=True):
+    """
+    Compute the cross-entropy loss on valid targets (i.e. entires >= 0, invalid labels have entry -1).
+    :param input: 1 x C x H x W Variable with FloatTensor
+    :param target: 1 x H x W Variable with LongTensor
+    :param weight:
+    :param size_average:
+    :return:
+    """
     # input: (n, c, h, w), target: (n, h, w)
     n, c, h, w = input.size()
     # log_p: (n, c, h, w)
@@ -84,6 +138,8 @@ class Trainer(object):
         self.max_iter = max_iter
         self.best_mean_iu = 0
 
+        self.frobenius_loss = FrobeniusLoss(1000)
+
     def validate(self):
         training = self.model.training
         self.model.eval()
@@ -102,8 +158,10 @@ class Trainer(object):
             data, target = Variable(data, volatile=True), Variable(target)
             score = self.model(data)
 
-            loss = cross_entropy2d(score, target,
-                                   size_average=self.size_average)
+            #loss = cross_entropy2d(score, target,
+            #                       size_average=self.size_average)
+            loss = self.frobenius_loss.loss(score, target)
+
             if np.isnan(float(loss.data[0])):
                 raise ValueError('loss is nan while validating')
             val_loss += float(loss.data[0]) / len(data)
@@ -182,9 +240,11 @@ class Trainer(object):
             self.optim.zero_grad()
             score = self.model(data)
 
-            loss = cross_entropy2d(score, target,
-                                   size_average=self.size_average)
+            #loss = cross_entropy2d(score, target,
+            #                       size_average=self.size_average)
+            loss = self.frobenius_loss.loss(score, target)
             loss /= len(data)
+
             if np.isnan(float(loss.data[0])):
                 raise ValueError('loss is nan while training')
             loss.backward()

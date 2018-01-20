@@ -47,5 +47,5 @@ At `10fdec9`.
 |FCN8sAtOnce | [Original](https://github.com/shelhamer/fcn.berkeleyvision.org/tree/master/voc-fcn8s-atonce) | - | -     | **65.40** |
 |FCN8sAtOnce | Ours                                                                                         |11 | 96000 | 64.74 |
 
-<img src="static/fcn8s_iter28000.jpg" width="50%" />
+<img src=".readme/fcn8s_iter28000.jpg" width="50%" />
 Visualization of validation result of FCN8s.

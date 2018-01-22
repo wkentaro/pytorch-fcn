@@ -22,7 +22,7 @@ PyTorch implementation of [Fully Convolutional Networks](https://github.com/shel
 git clone https://github.com/wkentaro/pytorch-fcn.git
 cd pytorch-fcn
 
-conda install pytorch cuda80 torchvision -c soumith
+conda install pytorch torchvision -c pytorch
 pip install .
 ```
 

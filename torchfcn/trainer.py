@@ -199,11 +199,10 @@ class Trainer(object):
             metrics = []
             lbl_pred = score.data.max(1)[1].cpu().numpy()[:, :, :]
             lbl_true = target.data.cpu().numpy()
-            for lt, lp in zip(lbl_true, lbl_pred):
-                acc, acc_cls, mean_iu, fwavacc = \
-                    torchfcn.utils.label_accuracy_score(
-                        [lt], [lp], n_class=n_class)
-                metrics.append((acc, acc_cls, mean_iu, fwavacc))
+            acc, acc_cls, mean_iu, fwavacc = \
+                torchfcn.utils.label_accuracy_score(
+                    lbl_true, lbl_pred, n_class=n_class)
+            metrics.append((acc, acc_cls, mean_iu, fwavacc))
             metrics = np.mean(metrics, axis=0)
 
             with open(osp.join(self.out, 'log.csv'), 'a') as f:

@@ -2,6 +2,6 @@ fcn>=6.1.5
 numpy
 Pillow
 scipy
-torch>=0.4.0
+torch>=0.2.0
 torchvision>=0.1.8
 tqdm

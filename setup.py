@@ -2,7 +2,8 @@
 
 from __future__ import print_function
 
-from distutils.version import LooseVersion
+import shlex
+import subprocess
 import sys
 
 from setuptools import find_packages
@@ -13,8 +14,6 @@ __version__ = '1.8.0'
 
 
 if sys.argv[-1] == 'release':
-    import shlex
-    import subprocess
     commands = [
         'python setup.py sdist',
         'twine upload dist/torchfcn-{0}.tar.gz'.format(__version__),
@@ -24,16 +23,6 @@ if sys.argv[-1] == 'release':
     for cmd in commands:
         subprocess.call(shlex.split(cmd))
     sys.exit(0)
-
-
-try:
-    import torch  # NOQA
-    if LooseVersion(torch.__version__) < LooseVersion('0.2.0'):
-        raise ImportError
-except ImportError:
-    print('Please install pytorch>=0.2.0. (See http://pytorch.org)',
-          file=sys.stderr)
-    sys.exit(1)
 
 
 setup(

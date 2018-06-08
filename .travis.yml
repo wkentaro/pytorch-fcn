@@ -12,7 +12,7 @@ cache:
   - pip
 
 install:
-  - pip install .
+  - pip install -q .
 
 before_script:
   - pip install -q flake8 pytest

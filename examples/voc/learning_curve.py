@@ -36,7 +36,10 @@ def learning_curve(log_file):
         'train/fwavacc',
     ]
     df_train = df[columns]
-    df_train = pandas.rolling_mean(df_train, window=10)
+    if hasattr(df_train, 'rolling'):
+        df_train = df_train.rolling(window=10).mean()
+    else:
+        df_train = pandas.rolling_mean(df_train, window=10)
     df_train = df_train.dropna()
     iter_per_epoch = df_train.query('epoch == 1')['iteration'].values[0]
     df_train['epoch_detail'] = df_train['iteration'] / iter_per_epoch

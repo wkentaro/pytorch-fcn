@@ -41,7 +41,7 @@ def learning_curve(log_file):
     else:
         df_train = pandas.rolling_mean(df_train, window=10)
     df_train = df_train.dropna()
-    iter_per_epoch = df_train.query('epoch == 1')['iteration'].values[0]
+    iter_per_epoch = df_train[df_train['epoch'] == 1]['iteration'].values[0]
     df_train['epoch_detail'] = df_train['iteration'] / iter_per_epoch
 
     # initialize DataFrame for val
@@ -56,7 +56,6 @@ def learning_curve(log_file):
     ]
     df_valid = df[columns]
     df_valid = df_valid.dropna()
-    iter_per_epoch = df_valid.query('epoch == 1')['iteration'].values[0]
     df_valid['epoch_detail'] = df_valid['iteration'] / iter_per_epoch
 
     data_frames = {'train': df_train, 'valid': df_valid}

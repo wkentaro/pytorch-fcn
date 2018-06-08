@@ -29,8 +29,10 @@ configurations = {
 
 def git_hash():
     cmd = 'git log -n 1 --pretty="%h"'
-    hash = subprocess.check_output(shlex.split(cmd)).strip()
-    return hash
+    ret = subprocess.check_output(shlex.split(cmd)).strip()
+    if isinstance(ret, bytes):
+        ret = ret.decode()
+    return ret
 
 
 def get_log_dir(model_name, config_id, cfg):

@@ -110,9 +110,10 @@ class Trainer(object):
 
             loss = cross_entropy2d(score, target,
                                    size_average=self.size_average)
-            if np.isnan(float(loss.data[0])):
+            loss_data = float(loss.data[0])
+            if np.isnan(loss_data):
                 raise ValueError('loss is nan while validating')
-            val_loss += float(loss.data[0]) / len(data)
+            val_loss += loss_data / len(data)
 
             imgs = data.data.cpu()
             lbl_pred = score.data.max(1)[1].cpu().numpy()[:, :, :]
@@ -191,7 +192,8 @@ class Trainer(object):
             loss = cross_entropy2d(score, target,
                                    size_average=self.size_average)
             loss /= len(data)
-            if np.isnan(float(loss.data[0])):
+            loss_data = float(loss.data[0])
+            if np.isnan(loss_data):
                 raise ValueError('loss is nan while training')
             loss.backward()
             self.optim.step()
@@ -209,7 +211,7 @@ class Trainer(object):
                 elapsed_time = (
                     datetime.datetime.now(pytz.timezone('Asia/Tokyo')) -
                     self.timestamp_start).total_seconds()
-                log = [self.epoch, self.iteration] + [loss.data[0]] + \
+                log = [self.epoch, self.iteration] + [loss_data] + \
                     metrics.tolist() + [''] * 5 + [elapsed_time]
                 log = map(str, log)
                 f.write(','.join(log) + '\n')

@@ -13,10 +13,9 @@ __version__ = '1.9.0'
 
 if sys.argv[-1] == 'release':
     commands = [
-        'python setup.py sdist',
-        'twine upload dist/torchfcn-{0}.tar.gz'.format(__version__),
         'git tag v{0}'.format(__version__),
         'git push origin master --tags',
+        'python setup.py sdist upload',
     ]
     for cmd in commands:
         subprocess.call(shlex.split(cmd))

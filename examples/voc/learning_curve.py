@@ -20,7 +20,7 @@ def learning_curve(log_file):
     colors = ['red', 'green', 'blue', 'purple', 'orange']
     colors = seaborn.xkcd_palette(colors)
 
-    plt.figure(figsize=(20, 6), dpi=500)
+    plt.figure(figsize=(20, 6), dpi=300)
 
     row_min = df.min()
     row_max = df.max()

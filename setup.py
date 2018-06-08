@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
-
 import shlex
 import subprocess
 import sys
@@ -10,7 +8,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-__version__ = '1.8.0'
+__version__ = '1.9.0'
 
 
 if sys.argv[-1] == 'release':

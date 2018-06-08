@@ -22,9 +22,11 @@ PyTorch implementation of [Fully Convolutional Networks](https://github.com/shel
 ```bash
 git clone https://github.com/wkentaro/pytorch-fcn.git
 cd pytorch-fcn
-
-conda install pytorch torchvision -c pytorch
 pip install .
+
+# or
+
+pip install torchfcn
 ```
 
 

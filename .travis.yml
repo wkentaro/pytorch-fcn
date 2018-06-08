@@ -4,35 +4,18 @@ dist: trusty
 
 language: python
 
-matrix:
-  include:
-    - python: 2.7
-    - python: 3.6
+python:
+  - 2.7
+  - 3.6
 
 cache:
-  - ccache
   - pip
 
-before_install:
-  # install miniconda
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
-    else
-      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-    fi
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  - conda info -a
-
 install:
-  - conda create --name=pytorch-fcn python=$TRAVIS_PYTHON_VERSION -q -y
-  - conda install pytorch torchvision cuda80 -c soumith -q -y
-  - pip install -q .
+  - pip install .
 
 before_script:
-  - pip install -q hacking pytest
+  - pip install -q flake8 pytest
 
 script:
   - flake8 .

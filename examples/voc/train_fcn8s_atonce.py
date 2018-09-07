@@ -1,47 +1,53 @@
 #!/usr/bin/env python
 
 import argparse
+import datetime
 import os
 import os.path as osp
 
 import torch
+import yaml
 
 import torchfcn
 
-from train_fcn32s import get_log_dir
 from train_fcn32s import get_parameters
-
-
-configurations = {
-    # same configuration as original work
-    # https://github.com/shelhamer/fcn.berkeleyvision.org
-    1: dict(
-        max_iteration=100000,
-        lr=1.0e-10,
-        momentum=0.99,
-        weight_decay=0.0005,
-        interval_validate=4000,
-    )
-}
 
 
 here = osp.dirname(osp.abspath(__file__))
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-g', '--gpu', type=int, required=True)
-    parser.add_argument('-c', '--config', type=int, default=1,
-                        choices=configurations.keys())
-    parser.add_argument('--resume', help='Checkpoint path')
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument('-g', '--gpu', type=int, required=True, help='gpu id')
+    parser.add_argument('--resume', help='checkpoint path')
+    # configurations (same configuration as original work)
+    # https://github.com/shelhamer/fcn.berkeleyvision.org
+    parser.add_argument(
+        '--max-iteration', type=int, default=100000, help='max iteration'
+    )
+    parser.add_argument(
+        '--lr', type=float, default=1.0e-10, help='learning rate',
+    )
+    parser.add_argument(
+        '--weight-decay', type=float, default=0.0005, help='weight decay',
+    )
+    parser.add_argument(
+        '--momentum', type=float, default=0.99, help='momentum',
+    )
     args = parser.parse_args()
 
-    gpu = args.gpu
-    cfg = configurations[args.config]
-    out = get_log_dir('fcn8s-atonce', args.config, cfg)
-    resume = args.resume
+    args.model = 'FCN8sAtOnce'
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu)
+    now = datetime.datetime.now()
+    args.out = osp.join(here, 'logs', now.strftime('%Y%m%d_%H%M%S.%f'))
+
+    os.makedirs(args.out)
+    with open(osp.join(args.out, 'config.yaml'), 'w') as f:
+        yaml.safe_dump(args.__dict__, f, default_flow_style=False)
+
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
     cuda = torch.cuda.is_available()
 
     torch.manual_seed(1337)
@@ -65,8 +71,8 @@ def main():
     model = torchfcn.models.FCN8sAtOnce(n_class=21)
     start_epoch = 0
     start_iteration = 0
-    if resume:
-        checkpoint = torch.load(resume)
+    if args.resume:
+        checkpoint = torch.load(args.resume)
         model.load_state_dict(checkpoint['model_state_dict'])
         start_epoch = checkpoint['epoch']
         start_iteration = checkpoint['iteration']
@@ -82,12 +88,12 @@ def main():
         [
             {'params': get_parameters(model, bias=False)},
             {'params': get_parameters(model, bias=True),
-             'lr': cfg['lr'] * 2, 'weight_decay': 0},
+             'lr': args.lr * 2, 'weight_decay': 0},
         ],
-        lr=cfg['lr'],
-        momentum=cfg['momentum'],
-        weight_decay=cfg['weight_decay'])
-    if resume:
+        lr=args.lr,
+        momentum=args.momentum,
+        weight_decay=args.weight_decay)
+    if args.resume:
         optim.load_state_dict(checkpoint['optim_state_dict'])
 
     trainer = torchfcn.Trainer(
@@ -96,9 +102,9 @@ def main():
         optimizer=optim,
         train_loader=train_loader,
         val_loader=val_loader,
-        out=out,
-        max_iter=cfg['max_iteration'],
-        interval_validate=cfg.get('interval_validate', len(train_loader)),
+        out=args.out,
+        max_iter=args.max_iteration,
+        interval_validate=4000,
     )
     trainer.epoch = start_epoch
     trainer.iteration = start_iteration

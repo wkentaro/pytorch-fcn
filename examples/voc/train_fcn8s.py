@@ -83,7 +83,11 @@ def main():
         start_iteration = checkpoint['iteration']
     else:
         fcn16s = torchfcn.models.FCN16s()
-        fcn16s.load_state_dict(torch.load(args.pretrained_model))
+        state_dict = torch.load(args.pretrained_model)
+        try:
+            fcn16s.load_state_dict(state_dict)
+        except RuntimeError:
+            fcn16s.load_state_dict(state_dict['model_state_dict'])
         model.copy_params_from_fcn16s(fcn16s)
     if cuda:
         model = model.cuda()

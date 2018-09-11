@@ -34,7 +34,7 @@ def cross_entropy2d(input, target, weight=None, size_average=True):
     # target: (n*h*w,)
     mask = target >= 0
     target = target[mask]
-    loss = F.nll_loss(log_p, target, weight=weight, size_average=False)
+    loss = F.nll_loss(log_p, target, weight=weight, reduction='sum')
     if size_average:
         loss /= mask.data.sum()
     return loss
@@ -105,12 +105,13 @@ class Trainer(object):
                 leave=False):
             if self.cuda:
                 data, target = data.cuda(), target.cuda()
-            data, target = Variable(data, volatile=True), Variable(target)
-            score = self.model(data)
+            data, target = Variable(data), Variable(target)
+            with torch.no_grad():
+                score = self.model(data)
 
             loss = cross_entropy2d(score, target,
                                    size_average=self.size_average)
-            loss_data = float(loss.data[0])
+            loss_data = loss.data.item()
             if np.isnan(loss_data):
                 raise ValueError('loss is nan while validating')
             val_loss += loss_data / len(data)
@@ -192,7 +193,7 @@ class Trainer(object):
             loss = cross_entropy2d(score, target,
                                    size_average=self.size_average)
             loss /= len(data)
-            loss_data = float(loss.data[0])
+            loss_data = loss.data.item()
             if np.isnan(loss_data):
                 raise ValueError('loss is nan while training')
             loss.backward()

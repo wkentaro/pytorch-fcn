@@ -14,6 +14,7 @@ def main():
     headers = [
         'name',
         'model',
+        'git_hash',
         'pretrained_model',
         'epoch',
         'iteration',
@@ -40,6 +41,7 @@ def main():
         rows.append([
             osp.join(logs_dir, log),
             config['model'],
+            config['git_hash'],
             config.get('pretrained_model', None),
             row_best.index[0][0],
             row_best.index[0][1],

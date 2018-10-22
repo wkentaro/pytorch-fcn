@@ -11,6 +11,7 @@ import yaml
 import torchfcn
 
 from train_fcn32s import get_parameters
+from train_fcn32s import git_hash
 
 
 here = osp.dirname(osp.abspath(__file__))
@@ -39,6 +40,7 @@ def main():
     args = parser.parse_args()
 
     args.model = 'FCN8sAtOnce'
+    args.git_hash = git_hash()
 
     now = datetime.datetime.now()
     args.out = osp.join(here, 'logs', now.strftime('%Y%m%d_%H%M%S.%f'))

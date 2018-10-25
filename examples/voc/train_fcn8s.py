@@ -10,8 +10,8 @@ import yaml
 
 import torchfcn
 
-from train_fcn32s import git_hash
 from train_fcn32s import get_parameters
+from train_fcn32s import git_hash
 
 
 here = osp.dirname(osp.abspath(__file__))

@@ -30,7 +30,7 @@ install:
   - pip install -q .
 
 before_script:
-  - pip install -q flake8 pytest
+  - pip install -q hacking pytest
 
 script:
   - flake8 .

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import distutils.spawn
 import shlex
 import subprocess
 import sys
@@ -7,24 +8,42 @@ import sys
 from setuptools import find_packages
 from setuptools import setup
 
+import github2pypi
 
-__version__ = '1.9.0'
+
+version = '1.9.0'
 
 
-if sys.argv[-1] == 'release':
+if sys.argv[1] == 'release':
+    if not distutils.spawn.find_executable('twine'):
+        print(
+            'Please install twine:\n\n\tpip install twine\n',
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
     commands = [
-        'git tag v{}'.format(__version__),
-        'git push origin master --tags',
-        'python setup.py sdist upload',
+        'git pull origin master',
+        'git tag v{:s}'.format(version),
+        'git push origin master --tag',
+        'python setup.py sdist',
+        'twine upload dist/torchfcn-{:s}.tar.gz'.format(version),
     ]
     for cmd in commands:
-        subprocess.call(shlex.split(cmd))
+        print('+ {}'.format(cmd))
+        subprocess.check_call(shlex.split(cmd))
     sys.exit(0)
+
+
+with open('README.md') as f:
+    long_description = github2pypi.replace_url(
+        slug='wkentaro/pytorch-fcn', content=f.read()
+    )
 
 
 setup(
     name='torchfcn',
-    version=__version__,
+    version=version,
     packages=find_packages(),
     install_requires=[r.strip() for r in open('requirements.txt')],
     description='PyTorch Implementation of Fully Convolutional Networks.',

@@ -44,7 +44,7 @@ with open('README.md') as f:
 setup(
     name='torchfcn',
     version=version,
-    packages=find_packages(),
+    packages=find_packages(exclude=['github2pypi']),
     install_requires=[r.strip() for r in open('requirements.txt')],
     description='PyTorch Implementation of Fully Convolutional Networks.',
     long_description=long_description,

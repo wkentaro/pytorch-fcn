@@ -27,10 +27,10 @@ before_install:
 install:
   - conda create --name=fcn python=$TRAVIS_PYTHON_VERSION -q -y
   - conda install -c pytorch pytorch torchvision -q -y
-  - pip install -q .
+  - pip install .
 
 before_script:
-  - pip install -q hacking pytest
+  - pip install hacking pytest
 
 script:
   - flake8 .

@@ -11,6 +11,13 @@ python:
 cache:
   - pip
 
+notifications:
+  email: false
+
+branches:
+  only:
+    - master
+
 before_install:
   # install miniconda
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
@@ -36,9 +43,7 @@ script:
   - flake8 .
   - pytest -vs tests
 
-notifications:
-  email: false
-
-branches:
-  only:
-    - master
+after_success:
+  - rm -f dist/*.tar.gz
+  - python setup.py sdist
+  - pip install dist/*.tar.gz

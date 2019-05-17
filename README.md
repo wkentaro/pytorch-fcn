@@ -52,3 +52,17 @@ At `10fdec9`.
 
 <img src=".readme/fcn8s_iter28000.jpg" width="50%" />
 Visualization of validation result of FCN8s.
+
+
+## Cite This Project
+
+If you use this project in your research or wish to refer to the baseline results published in the README, please use the following BibTeX entry.
+
+```bash
+@misc{pytorch-fcn2017,
+  author =       {Ketaro Wada},
+  title =        {{pytorch-fcn: PyTorch Implementation of Fully Convolutional Networks}},
+  howpublished = {\url{https://github.com/wkentaro/pytorch-fcn}},
+  year =         {2017}
+}
+```

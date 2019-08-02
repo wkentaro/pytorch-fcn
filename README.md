@@ -20,7 +20,7 @@ PyTorch implementation of [Fully Convolutional Networks](https://github.com/shel
 ## Installation
 
 ```bash
-git clone https://github.com/wkentaro/pytorch-fcn.git
+git clone https://github.com/wkentaro/pytorch-fcn.git --recursive
 cd pytorch-fcn
 pip install .
 

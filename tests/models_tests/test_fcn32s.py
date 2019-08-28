@@ -3,7 +3,6 @@
 # https://github.com/pytorch/pytorch/issues/2083
 import torch
 
-import matplotlib.pyplot as plt
 import numpy as np
 import skimage.data
 
@@ -40,6 +39,8 @@ def test_get_upsampling_weight():
 
 
 if __name__ == '__main__':
+    import matplotlib.pyplot as plt
+
     src, dst = test_get_upsampling_weight()
     plt.subplot(121)
     plt.imshow(src)

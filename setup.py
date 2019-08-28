@@ -11,7 +11,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-version = '1.9.5'
+version = '1.9.6'
 
 
 if sys.argv[1] == 'release':

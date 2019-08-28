@@ -41,6 +41,8 @@ def get_long_description():
 
     try:
         import github2pypi
+        if github2pypi.__file__ is None:
+            raise ImportError
     except ImportError:
         return long_description
 

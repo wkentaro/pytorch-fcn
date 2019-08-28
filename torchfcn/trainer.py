@@ -8,7 +8,7 @@ import shutil
 import fcn
 import numpy as np
 import pytz
-import scipy.misc
+import skimage.io
 import torch
 from torch.autograd import Variable
 import torch.nn.functional as F
@@ -134,7 +134,7 @@ class Trainer(object):
         if not osp.exists(out):
             os.makedirs(out)
         out_file = osp.join(out, 'iter%012d.jpg' % self.iteration)
-        scipy.misc.imsave(out_file, fcn.utils.get_tile_image(visualizations))
+        skimage.io.imsave(out_file, fcn.utils.get_tile_image(visualizations))
 
         val_loss /= len(self.val_loader)
 

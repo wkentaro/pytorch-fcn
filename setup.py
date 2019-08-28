@@ -41,14 +41,12 @@ def get_long_description():
 
     try:
         import github2pypi
-        if github2pypi.__file__ is None:
-            raise ImportError
-    except ImportError:
-        return long_description
 
-    return github2pypi.replace_url(
-        slug='wkentaro/pytorch-fcn', content=long_description
-    )
+        return github2pypi.replace_url(
+            slug='wkentaro/pytorch-fcn', content=long_description
+        )
+    except Exception:
+        return long_description
 
 
 def get_install_requires():

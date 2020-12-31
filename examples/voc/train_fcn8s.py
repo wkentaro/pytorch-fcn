@@ -85,7 +85,7 @@ def main():
         start_iteration = checkpoint['iteration']
     else:
         fcn16s = torchfcn.models.FCN16s()
-        state_dict = torch.load(args.pretrained_model)
+        state_dict = torch.load(args.pretrained-model)
         try:
             fcn16s.load_state_dict(state_dict)
         except RuntimeError:

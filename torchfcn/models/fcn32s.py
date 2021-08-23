@@ -31,9 +31,9 @@ class FCN32s(nn.Module):
     @classmethod
     def download(cls):
         return fcn.data.cached_download(
-            url='http://drive.google.com/uc?id=0B9P1L--7Wd2vM2oya3k0Zlgtekk',
+            url='https://drive.google.com/uc?id=11k2Q0bvRQgQbT6-jYWeh6nmAsWlSCY3f',
             path=cls.pretrained_model,
-            md5='8acf386d722dc3484625964cbe2aba49',
+            md5='d3eb467a80e7da0468a20dfcbc13e6c8',
         )
 
     def __init__(self, n_class=21):

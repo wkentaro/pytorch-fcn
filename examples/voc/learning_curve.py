@@ -6,10 +6,12 @@ import argparse
 import os.path as osp
 
 import matplotlib
-matplotlib.use('Agg')  # NOQA
-import matplotlib.pyplot as plt
-import pandas
-import seaborn
+
+matplotlib.use('Agg')
+
+import matplotlib.pyplot as plt  # NOQA
+import pandas  # NOQA
+import seaborn  # NOQA
 
 
 def learning_curve(log_file):

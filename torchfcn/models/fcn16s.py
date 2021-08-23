@@ -14,7 +14,7 @@ class FCN16s(nn.Module):
     @classmethod
     def download(cls):
         return fcn.data.cached_download(
-            url='http://drive.google.com/uc?id=1bctu58B6YH9bu6lBBSBB2rUeGlGhYLoP',
+            url='http://drive.google.com/uc?id=1bctu58B6YH9bu6lBBSBB2rUeGlGhYLoP',  # NOQA
             path=cls.pretrained_model,
             md5='a2d4035f669f09483b39c9a14a0d6670',
         )

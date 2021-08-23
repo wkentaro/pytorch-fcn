@@ -14,9 +14,9 @@ class FCN16s(nn.Module):
     @classmethod
     def download(cls):
         return fcn.data.cached_download(
-            url='http://drive.google.com/uc?id=0B9P1L--7Wd2vVGE3TkRMbWlNRms',
+            url='http://drive.google.com/uc?id=1bctu58B6YH9bu6lBBSBB2rUeGlGhYLoP',
             path=cls.pretrained_model,
-            md5='991ea45d30d632a01e5ec48002cac617',
+            md5='a2d4035f669f09483b39c9a14a0d6670',
         )
 
     def __init__(self, n_class=21):

@@ -23,9 +23,9 @@ if sys.argv[1] == 'release':
         sys.exit(1)
 
     commands = [
-        'git pull origin master',
+        'git pull origin main',
         'git tag v{:s}'.format(version),
-        'git push origin master --tag',
+        'git push origin main --tags',
         'python setup.py sdist',
         'twine upload dist/torchfcn-{:s}.tar.gz'.format(version),
     ]
